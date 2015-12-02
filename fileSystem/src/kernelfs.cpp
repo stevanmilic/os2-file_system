@@ -1,5 +1,6 @@
 //File: kernelfs.cpp
 #include "kernelfs.h"
+#include <iostream>
 
 KernelFS* KernelFS::onlySample = nullptr;
 
@@ -38,7 +39,7 @@ char KernelFS::kunmount(char partName){
 
 char KernelFS::kformat(char partName){
 	PartNum partIndex = partName - 'A';
-	if(partInter[partIndex]){
+	if(partInter[partIndex].part){
 		enterCriticalSection(partIndex);
 		Partition *part = partInter[partIndex].part;
 		std::memset(buffer,1,ClusterSize);

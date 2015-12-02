@@ -37,7 +37,7 @@ class KernelFS{
 		char *buffer;
 		fcbID fcbCounter;
 		Directory myDir;
-		List<FCB*>* openedFiles;
+		List<FCB*> *openedFiles;
 
 		static KernelFS* onlySample;
 		static KernelFS* sample();
