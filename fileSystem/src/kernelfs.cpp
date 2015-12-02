@@ -85,23 +85,28 @@ char KernelFS::kreadRootDir(char partName, EntryNum entryNum,Directory &dir){
 }
 
 File* KernelFS::kopen(char* fpath, char mode){
+	PartNum partIndex;
+	char *fname;
+	Partition *part;
+	char index = -1;
+	File *file;
+	FCB* newFCB;
 	switch(mode){
 		case 'r':
-			char partIndex = fpath[0] - 'A';
-			char* fname = getFileName(fpath);
-			Partition* part = partInter[partIndex].part;
+			partIndex = fpath[0] - 'A';
+			fname = getFileName(fpath);
+			part = partInter[partIndex].part;
 			enterCriticalSection(partIndex,fname);
 			std::memset(buffer,0,ClusterSize);
 			part->readCluster(partInter[partIndex].dirIndex, buffer);
 			std::memcpy(myDir,buffer,sizeof myDir);
-			char index = -1;
 			for(char i = 0; i < ENTRYCNT; i++)
 				if(myDir[i].name == fname)
 					index = i;
 			if(index < 0)
 				return nullptr;
-			File* file = new File();
-			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
+			file = new File();
+			newFCB = new FCB(myDir[index],partIndex,index,0);
 			openedFiles.add(newFCB,fcbCounter);
 			file->myImpl->setID(fcbCounter++);
 			break;
@@ -110,21 +115,20 @@ File* KernelFS::kopen(char* fpath, char mode){
 			//TO DO: 1)findEntry,2)OpenAnewEntry,3)loadAtributesOfFile,4)checkRights
 			//5)findFileSomeSpace!
 			//1)findEntry
-			char partIndex = fpath[0] - 'A';
-			char* fname = getFileName(fpath);
+			partIndex = fpath[0] - 'A';
+			fname = getFileName(fpath);
 			Partition* part = partInter[partIndex].part;
 			enterCriticalSection(partIndex,fname);
 			std::memset(buffer,0,ClusterSize);
 			part->readCluster(partInter[partIndex].dirIndex, buffer);
 			std::memcpy(myDir,buffer,sizeof myDir);
-			char index = -1;
 			for(char i = 0; i < ENTRYCNT; i++)
 				//2)findEntry
 				if(myDir[i].name == 0){
 					//3)loadAtributes
 					myDir[index = i].name = getName(fname);
 					myDir[index].ext = getExt(fname);
-					myDir[index].indexCluster = getNewCluster(part);
+					myDir[index].indexCluster = partInter[partIndex].dirIndex + 1;
 					myDir[index].size = ClusterSize;
 				}
 				else if(myDir[i].name == fname){
@@ -138,27 +142,26 @@ File* KernelFS::kopen(char* fpath, char mode){
 				return nullptr;
 			std::memcpy(buffer,myDir,sizeof myDir);
 			part->writeCluster(partInter[partIndex].dirIndex,buffer);
-			File* file = new File();
-			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
+			file = new File();
+			newFCB = new FCB(myDir[index],partIndex,index,0);
 			openedFiles.add(newFCB,fcbCounter);
 			file->myImpl->setID(fcbCounter++);
 			break;
 		case 'a':
-			char partIndex = fpath[0] - 'A';
-			char* fname = getFileName(fpath);
-			Partition* part = partInter[partIndex].part;
+			partIndex = fpath[0] - 'A';
+			fname = getFileName(fpath);
+			part = partInter[partIndex].part;
 			enterCriticalSection(partIndex,fname);
 			std::memset(buffer,0,ClusterSize);
 			part->readCluster(partInter[partIndex].dirIndex, buffer);
 			std::memcpy(myDir,buffer,sizeof myDir);
-			char index = -1;
 			for(char i = 0; i < ENTRYCNT; i++)
 				if(myDir[i].name == fname)
 					index = i;
 			if(index < 0)
 				return nullptr;
-			File* file = new File();
-			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
+			file = new File();
+			newFCB = new FCB(myDir[index],partIndex,index,0);
 			openedFiles.add(newFCB,fcbCounter);
 			file->myImpl->setID(fcbCounter++);
 			break;

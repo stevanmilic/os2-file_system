@@ -2,6 +2,7 @@
 #ifndef _file_h_
 #define _file_h_
 #include "fs.h"
+#include "kernelfile.h"
 
 class KernelFile;
 
