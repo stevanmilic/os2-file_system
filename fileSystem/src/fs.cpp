@@ -12,11 +12,11 @@ char FS::unmount(char part){
 }
 
 char FS::format(char part){
-	return myImpl->kformat();
+	return myImpl->kformat(part);
 }
 
 char FS::readRootDir(char part, EntryNum n,Directory &d){
-	return myImpl->kreadRootDir(char* fname)
+	return myImpl->kreadRootDir(part,n,&d)
 }
 
 char FS::doesExist(char* fname){

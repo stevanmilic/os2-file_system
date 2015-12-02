@@ -43,9 +43,9 @@ char KernelFS::kformat(char partName){
 		enterCriticalSection(partIndex);
 		Partition *part = partInter[partIndex].part;
 		std::memset(buffer,1,ClusterSize);
-		unsigned long bvClusters = part->getNumOfClusters()/ClusterSize + part->getNumOfClusters() % ClusterSize ? 1 : 0//if number of clusters exceeds clustersize
+		unsigned long bvClusters = part->getNumOfClusters()/ClusterSize + part->getNumOfClusters() % ClusterSize ? 1 : 0;//if number of clusters exceeds clustersize
 		partInter[partIndex].dirIndex = bvClusters + 1;// + 1 for dir index
-		std::memset(buffer,0,part->dirIndex);
+		std::memset(buffer,0,partInter[partIndex].dirIndex);
 		for(unsigned long i = 0; i < partInter[partIndex].dirIndex; i++){
 			part->writeCluster(i, buffer);
 			std::memset(buffer,1,ClusterSize);
@@ -93,7 +93,7 @@ File* KernelFS::kopen(char* fpath, char mode){
 			char partIndex = fpath[0] - 'A';
 			char* fname = getFileName(fpath);
 			Partition* part = partInter[partIndex].part;
-			enterCriticalSection(part,fname);
+			enterCriticalSection(partIndex,fname);
 			std::memset(buffer,0,ClusterSize);
 			part->readCluster(partInter[partIndex].dirIndex, buffer);
 			std::memcpy(myDir,buffer,sizeof myDir);
@@ -116,7 +116,7 @@ File* KernelFS::kopen(char* fpath, char mode){
 			char partIndex = fpath[0] - 'A';
 			char* fname = getFileName(fpath);
 			Partition* part = partInter[partIndex].part;
-			enterCriticalSection(part,fname);
+			enterCriticalSection(partIndex,fname);
 			std::memset(buffer,0,ClusterSize);
 			part->readCluster(partInter[partIndex].dirIndex, buffer);
 			std::memcpy(myDir,buffer,sizeof myDir);
@@ -149,7 +149,7 @@ File* KernelFS::kopen(char* fpath, char mode){
 			char partIndex = fpath[0] - 'A';
 			char* fname = getFileName(fpath);
 			Partition* part = partInter[partIndex].part;
-			enterCriticalSection(part,fname);
+			enterCriticalSection(partIndex,fname);
 			std::memset(buffer,0,ClusterSize);
 			part->readCluster(partInter[partIndex].dirIndex, buffer);
 			std::memcpy(myDir,buffer,sizeof myDir);

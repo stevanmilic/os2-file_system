@@ -51,7 +51,7 @@ class KernelFS{
 		char kdelete(char*); 
 		char kclose(fcbID);
 
-		void enterCriticalSection(char partName,char* fname = nullptr);
+		void enterCriticalSection(PartNum,char* fname = nullptr);
 		char* getFileName(char*);
 		char* getName(char*);
 		char* getExt(char*);
