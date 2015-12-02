@@ -4,6 +4,7 @@
 #include "fs.h"
 #include "mutex.h"
 #include "windows.h"
+#include "list.h"
 
 typedef unsigned long fcbID;
 typedef char PartNum;
@@ -20,7 +21,7 @@ class KernelFS{
 			EntryNum entryNum;
 			ByteCnt cursor;
 			FCB(Entry e, PartNum pn,EntryNum en, ByteCnt bc) : entry(e), partNum(pn), entryNum(en), cursor(bc) {}
-		}
+		};
 		
 		struct PartitionInterface{
 			Partion* part;
@@ -28,16 +29,8 @@ class KernelFS{
 			~PartitionInterface(){
 				part = nullptr;
 			}
-		}
+		};
 
-		struct IndexClusterFirst{
-			ClusterNo dataCluster[1024];
-			ClusterNo indexCluster[1024];
-		}
-
-		struct IndexClusterSecond{
-			ClusterNo dataCluster[ClusterSize];
-		}
 		
 		const PartNum alphabetSize = 26;
 		HANDLE sem;
@@ -65,9 +58,6 @@ class KernelFS{
 		char* getFileName(char*);
 		char* getName(char*);
 		char* getExt(char*);
-		ClusterNo getFreeCluster(Partition*);
-	  ClusterNo findLastWrittenCluster(ClusterNo);
-		ByteCnt findLastWrittenByte(ClusterNo);
 	public:
 		~KernelFS();
 };

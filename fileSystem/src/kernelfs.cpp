@@ -103,10 +103,10 @@ File* KernelFS::kopen(char* fpath, char mode){
 					index = i;
 			if(index < 0)
 				return nullptr;
-			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
-			openedFiles_list.add(newFCB,fcbCounter++);
 			File* file = new File();
-			file->myImpl->position(myDir[index].indexCluster);
+			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
+			openedFiles_list.add(newFCB,fcbCounter);
+			file->myImpl->setID(fcbCounter++);
 			break;
 		case 'w':
 			//start creating a file

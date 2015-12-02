@@ -1,8 +1,6 @@
 // File: fs.h
 #ifndef _fs_h_
 #define _fs_h_
-#include "part.h"
-#include "file.h" 
 
 typedef unsigned long BytesCnt;
 typedef unsigned long EntryNum;
@@ -16,7 +14,7 @@ struct Entry {
 	char reserved;
 	unsigned long indexCluster;
 	unsigned long size;
-}
+};
 
 typedef Entry Directory[ENTRYCNT];
 class KernelFS;

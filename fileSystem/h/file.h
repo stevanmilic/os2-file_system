@@ -1,6 +1,7 @@
 // File: file.h
 #ifndef _file_h_
 #define _file_h_
+#include "fs.h"
 
 class KernelFile;
 

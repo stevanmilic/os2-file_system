@@ -9,6 +9,15 @@ class KernelFile{
 	private:
 		friend class File;
 
+		struct IndexClusterFirst{
+			ClusterNo dataCluster[1024];
+			ClusterNo indexCluster[1024];
+		}
+
+		struct IndexClusterSecond{
+			ClusterNo dataCluster[ClusterSize];
+		}
+
 		HANDLE sem;
 
 		KernelFile();
