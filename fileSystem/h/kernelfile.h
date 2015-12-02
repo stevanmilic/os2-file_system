@@ -5,6 +5,9 @@
 #include "mutex.h"
 #include "windows.h"
 
+#define signal(x) ReleaseSemaphore(x,1,NULL)
+#define wait(x) WaitForSingleObject(x,INFINITE)
+
 class KernelFile{
 	private:
 		friend class File;
@@ -29,6 +32,7 @@ class KernelFile{
 		char eof();
 		BytesCnt getFileSize();
 		char truncate();
+		void setID(unsigned long);
 
 	public:
 		~KernelFile();

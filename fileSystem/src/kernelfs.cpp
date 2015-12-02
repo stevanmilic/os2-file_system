@@ -84,7 +84,6 @@ char KernelFS::kreadRootDir(char partName, EntryNum entryNum,Directory &dir){
 	return 1;
 }
 
-
 File* KernelFS::kopen(char* fpath, char mode){
 	switch(mode){
 		case 'r':
@@ -103,7 +102,7 @@ File* KernelFS::kopen(char* fpath, char mode){
 				return nullptr;
 			File* file = new File();
 			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
-			openedFiles_list.add(newFCB,fcbCounter);
+			openedFiles.add(newFCB,fcbCounter);
 			file->myImpl->setID(fcbCounter++);
 			break;
 		case 'w':
@@ -133,6 +132,7 @@ File* KernelFS::kopen(char* fpath, char mode){
 					if(index > 0){
 						myDir[index].name = 0;
 					return nullptr;
+					}
 				}
 			if(index < 0)
 				return nullptr;
@@ -140,7 +140,7 @@ File* KernelFS::kopen(char* fpath, char mode){
 			part->writeCluster(partInter[partIndex].dirIndex,buffer);
 			File* file = new File();
 			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
-			openedFiles_list.add(newFCB,fcbCounter);
+			openedFiles.add(newFCB,fcbCounter);
 			file->myImpl->setID(fcbCounter++);
 			break;
 		case 'a':
@@ -159,7 +159,7 @@ File* KernelFS::kopen(char* fpath, char mode){
 				return nullptr;
 			File* file = new File();
 			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
-			openedFiles_list.add(newFCB,fcbCounter);
+			openedFiles.add(newFCB,fcbCounter);
 			file->myImpl->setID(fcbCounter++);
 			break;
 		default:

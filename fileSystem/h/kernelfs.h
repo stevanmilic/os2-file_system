@@ -6,6 +6,10 @@
 #include "windows.h"
 #include "list.h"
 #include "part.h"
+#include "file.h"
+
+#define signal(x) ReleaseSemaphore(x,1,NULL)
+#define wait(x) WaitForSingleObject(x,INFINITE)
 
 typedef unsigned long fcbID;
 typedef char PartNum;
