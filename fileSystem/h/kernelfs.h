@@ -27,21 +27,18 @@ class KernelFS{
 		struct PartitionInterface{
 			Partition* part;
 			ClusterNo dirIndex;
-			~PartitionInterface(){
-				part = nullptr;
-			}
 		};
 
 		
 		const PartNum alphabetSize = 26;
 		HANDLE sem;
 
-		PartitionInterface *partInter;
+		PartitionInterface partInter[alphabetSize];
 		PartNum partCounter;
 		char *buffer;
 		fcbID fcbCounter;
 		Directory myDir;
-		List<FCB*> openedFiles;
+		List<FCB*>* openedFiles;
 
 		static KernelFS* onlySample;
 		static KernelFS* sample();
