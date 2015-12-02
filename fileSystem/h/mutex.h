@@ -1,4 +1,6 @@
 //File: mutex.h
+#ifndef _mutex_h_
+#define _mutex_h_
 #include "windows.h"
 
 #define signal(x) ReleaseSemaphore(x,1,NULL)
@@ -11,3 +13,4 @@ class Mutex{
 	private:
 		HANDLE *sem;
 };
+#endif
