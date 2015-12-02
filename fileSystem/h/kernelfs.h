@@ -60,7 +60,6 @@ class KernelFS{
 		char* getName(char*);
 		char* getExt(char*);
 
-		friend void KernelFile::setID(fcbID);
 	public:
 		~KernelFS();
 };

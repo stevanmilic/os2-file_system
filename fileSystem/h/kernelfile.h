@@ -15,11 +15,11 @@ class KernelFile{
 		struct IndexClusterFirst{
 			ClusterNo dataCluster[1024];
 			ClusterNo indexCluster[1024];
-		}
+		};
 
 		struct IndexClusterSecond{
 			ClusterNo dataCluster[ClusterSize];
-		}
+		};
 
 		HANDLE sem;
 
@@ -33,6 +33,8 @@ class KernelFile{
 		BytesCnt getFileSize();
 		char truncate();
 		void setID(unsigned long);
+
+		friend char KernelFS::kopen(char*,char);
 
 	public:
 		~KernelFile();
