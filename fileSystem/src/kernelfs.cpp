@@ -5,12 +5,10 @@
 KernelFS* KernelFS::onlySample = nullptr;
 
 KernelFS::KernelFS(){
-	openedFiles_list = new List<FCB*>();
 	buffer = new char[ClusterSize];
 }
 
 KernelFS::~KernelFS(){
-	delete openedFiles_list;
 	delete [] buffer;
 }
 
