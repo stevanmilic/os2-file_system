@@ -19,7 +19,7 @@ class KernelFS{
 			PartNum partNum;
 			EntryNum entryNum;
 			ByteCnt cursor;
-			FCB(EntryNum e, PartNum pn,EntryNum en, ByteCnt bc) : entry(e), partNum(pn, entryNum(en), cursor(bc) {}
+			FCB(Entry e, PartNum pn,EntryNum en, ByteCnt bc) : entry(e), partNum(pn), entryNum(en), cursor(bc) {}
 		}
 		
 		struct PartitionInterface{
@@ -42,7 +42,6 @@ class KernelFS{
 		const PartNum alphabetSize = 26;
 		HANDLE sem;
 
-		
 		PartitionInterface *partInter;
 		PartNum partCounter;
 		char *buffer;

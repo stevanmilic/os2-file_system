@@ -1,7 +1,7 @@
 //File : kernelfile.h
 #ifndef _kernelfile_h_
 #define _kernelfile_h_
-#include "fs.h"
+#include "file.h"
 #include "mutex.h"
 #include "windows.h"
 

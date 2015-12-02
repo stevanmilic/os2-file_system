@@ -2,7 +2,6 @@
 #ifndef _fs_h_
 #define _fs_h_
 #include "part.h"
-#include "kernelfs.h"
 #include "file.h" 
 
 typedef unsigned long BytesCnt;
