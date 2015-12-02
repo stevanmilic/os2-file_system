@@ -2,7 +2,7 @@
 KernelFS* FS::myImpl = nullptr;
 
 char FS::mount(Partition* partition){
-	myImpl = myImpl();
+	myImpl = KenelFS::sample();
 	return myImpl()->kmount(partition);
 }
 

@@ -78,6 +78,7 @@ char KernelFS::kreadRootDir(char partName, EntryNum entryNum,Directory &dir){
 	part->readCluster(partInter[partIndex].dirIndex,buffer);
 	std::memcpy(dir,buffer,ClusterSize);
 	char counter;
+	//TO DO: faster search -> log saerch
 	for(int i = entryNum; i < ENTRYCNT; i++)
 		if(myDir[i].name != 0)
 			dir[counter++] = myDir[i];
@@ -131,19 +132,19 @@ File* KernelFS::kopen(char* fpath, char mode){
 					myDir[index].size = ClusterSize;
 				}
 				else if(myDir[i].name == fname){
+					kdelete(fpath);
 					if(index > 0){
 						myDir[index].name = 0;
-					kdelete(fpath);
 					return nullptr;
 				}
 			if(index < 0)
 				return nullptr;
 			std::memcpy(buffer,myDir,sizeof myDir);
 			part->writeCluster(partInter[partIndex].dirIndex,buffer);
-			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
-			openedFiles_list.add(newFCB,fcbCounter++);
 			File* file = new File();
-			file->myImpl->position(myDir[index].indexCluster);
+			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
+			openedFiles_list.add(newFCB,fcbCounter);
+			file->myImpl->setID(fcbCounter++);
 			break;
 		case 'a':
 			char partIndex = fpath[0] - 'A';
@@ -159,12 +160,10 @@ File* KernelFS::kopen(char* fpath, char mode){
 					index = i;
 			if(index < 0)
 				return nullptr;
-			openedFiles_list.add(newFCB,fcbCounter++);
-			ClusterNo cluster = findLastWrittenCluster(myDir[index].indexCluster);
-			ByteCnt cursor = findLastWrittenByte(cluster);
-			FCB* newFCB = new FCB(myDir[index],partIndex,index,cursor);
 			File* file = new File();
-			file->myImpl->position(cluster,cursor);
+			FCB* newFCB = new FCB(myDir[index],partIndex,index,0);
+			openedFiles_list.add(newFCB,fcbCounter);
+			file->myImpl->setID(fcbCounter++);
 			break;
 		default:
 			return nullptr;

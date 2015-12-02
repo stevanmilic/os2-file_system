@@ -5,6 +5,7 @@
 #include "mutex.h"
 #include "windows.h"
 #include "list.h"
+#include "part.h"
 
 typedef unsigned long fcbID;
 typedef char PartNum;
@@ -19,12 +20,12 @@ class KernelFS{
 			Entry entry;
 			PartNum partNum;
 			EntryNum entryNum;
-			ByteCnt cursor;
-			FCB(Entry e, PartNum pn,EntryNum en, ByteCnt bc) : entry(e), partNum(pn), entryNum(en), cursor(bc) {}
+			BytesCnt cursor;
+			FCB(Entry e, PartNum pn,EntryNum en, BytesCnt bc) : entry(e), partNum(pn), entryNum(en), cursor(bc) {}
 		};
 		
 		struct PartitionInterface{
-			Partion* part;
+			Partition* part;
 			ClusterNo dirIndex;
 			~PartitionInterface(){
 				part = nullptr;
@@ -38,7 +39,7 @@ class KernelFS{
 		PartitionInterface *partInter;
 		PartNum partCounter;
 		char *buffer;
-		unsigned long fcbCounter;
+		fcbID fcbCounter;
 		Directory myDir;
 		List<FCB*> openedFiles;
 
