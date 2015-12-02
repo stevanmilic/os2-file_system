@@ -1,8 +1,7 @@
 //File: kernelfs.cpp
 #include "kernelfs.h"
 
-KernelFS* KernelFS::onlySample = nullptr;//after this add List...
-List<FCB*>* KernelFS::openedFiles_list = nullptr;
+KernelFS* KernelFS::onlySample = nullptr;
 
 KernelFS::KernelFS(){
 	openedFiles_list = new List<FCB*>();

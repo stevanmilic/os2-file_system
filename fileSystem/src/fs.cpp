@@ -1,4 +1,5 @@
 #include "fs.h"
+#include "kernelfs.h"
 KernelFS* FS::myImpl = nullptr;
 
 char FS::mount(Partition* partition){

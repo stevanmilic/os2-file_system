@@ -9,6 +9,15 @@
 
 typedef unsigned long fcbID;
 typedef char PartNum;
+const PartNum alphabetSize = 26;
+
+struct FCB{
+	Entry entry;
+	PartNum partNum;
+	EntryNum entryNum;
+	BytesCnt cursor;
+	FCB(Entry e, PartNum pn,EntryNum en, BytesCnt bc) : entry(e), partNum(pn), entryNum(en), cursor(bc) {}
+};
 
 class KernelFS{
 	protected:
@@ -16,21 +25,11 @@ class KernelFS{
 	private:
 		friend class FS;
 
-		struct FCB{
-			Entry entry;
-			PartNum partNum;
-			EntryNum entryNum;
-			BytesCnt cursor;
-			FCB(Entry e, PartNum pn,EntryNum en, BytesCnt bc) : entry(e), partNum(pn), entryNum(en), cursor(bc) {}
-		};
-		
 		struct PartitionInterface{
 			Partition* part;
 			ClusterNo dirIndex;
 		};
-
 		
-		const PartNum alphabetSize = 26;
 		HANDLE sem;
 
 		PartitionInterface partInter[alphabetSize];
