@@ -6,7 +6,7 @@
 KernelFS* KernelFS::onlySample = nullptr;
 
 KernelFS::KernelFS(){
-	buffer = new char[ClusterSize];
+	pw = PartWrapper::sample();
 }
 
 KernelFS::~KernelFS(){
@@ -25,7 +25,7 @@ char KernelFS::kmount(Partition *part){
 
 char KernelFS::kunmount(char part){
 	if(pw.checkMount(part)){
-		enterCriticalSection(partIndex);
+		enterCriticalSection(part);
 		pw.unMountPart(part);
 		return 1;
 	}
@@ -34,7 +34,7 @@ char KernelFS::kunmount(char part){
 
 char KernelFS::kformat(char partName){
 	if(pw.checkMount()){
-		enterCriticalSection(partIndex);
+		enterCriticalSection(part);
 		Partition *part = partInter[partIndex].part;
 		std::memset(buffer,1,ClusterSize);
 		unsigned long bvClusters = part->getNumOfClusters()/ClusterSize + part->getNumOfClusters() % ClusterSize ? 1 : 0;//if number of clusters exceeds clustersize
