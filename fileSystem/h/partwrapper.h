@@ -9,11 +9,14 @@ class PartWrapper{
 	//TO DO:
 	//ima hash tabelu koja sadrzi trenutno montirane(mount) particije
 	//moze da se doda,uzme particija, direktiva oko dirIndexa(prosledj se partName)
-	//moze da se upisuje, da se cita sa particije ->memset, memcpy -> buffer
 	//prosledjuse fpath, vrati ime particije
-	//vraca broj potreban za bitvektor klastere... dirIndex...
 	//vraca prvu prazni klaster za otvoreni fajl,ili za nest sto treba fajl-u?
-	//da se koristi partitionIntreface i od kernelfile.h :)
+	//moze da se upisuje, da se cita sa particije ->memset, memcpy -> buffer
+	//-->> trebalo bi napravati cache koji dovlaci klastere sa particije i cuva ih tako
+	//da lako i efikasno moze da se pristupa podacima, nije lose imati cache i zai
+	//data klastere i za indexne klastere(ne moraju svi indexi, niti svi podaci za fajl)
+	//velicina cache je zavisna od velicine fajla, formula?
+	//svaki kes za jedan PartInterface? ili samo jedan univerzalni u partWrapper-u?
 
 	HashTable<PartInterface*> pt(alphabetSize);
 	char partName = 'A';

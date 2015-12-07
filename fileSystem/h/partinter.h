@@ -22,7 +22,7 @@ public:
 		return dirIndex;
 	}
 
-	ClusterNo bvClustersSize(){
+	ClusterNo bvClustersNum(){
 		return part->getNumOfClusters()/ClusterSize + part->getNumOfClusters() % ClusterSize ? 1 : 0;//if number of clusters exceeds clustersize
 	}
 

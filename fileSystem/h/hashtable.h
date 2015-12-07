@@ -23,7 +23,7 @@ template <class T> class HashTable{
 		}
   }; 
   Elem **table;
-	//For m = 2^n, a good choice for the constants are c1 = c2 = 1/2, as the values of h(k,i) for i in [0,m-1] are all distinct.
+	//Good choice for n is, n = 2^m, or n is a prime number
   int n;
   int keysInserted = 0;
   AddressFunction *address;
