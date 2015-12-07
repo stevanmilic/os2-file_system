@@ -75,6 +75,8 @@ class PartitionWrapper{
 	HashTable<PartInterface*> pt(alphabetSize);
 	char *buffer;
 
+	
+
 public:
 	char mountPart(Partition *part){
 		if(ht.fillRatio() == 1)
@@ -92,6 +94,10 @@ public:
 
 	char unMountPart(char part){
 		ht.deleteKey(PartInterface::toNumber(part));
+	}
+
+	void formatPart(char part){
+
 	}
 
 
