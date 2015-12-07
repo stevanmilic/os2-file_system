@@ -1,5 +1,6 @@
 //File: kernelfs.cpp
 #include "kernelfs.h"
+#include "kernelfile.h"
 #include <iostream>
 
 KernelFS* KernelFS::onlySample = nullptr;
@@ -19,25 +20,20 @@ KernelFS* KernelFS::sample(){
 }
 
 char KernelFS::kmount(Partition *part){
-	partInter[partCounter].part = part;	
-	if(partCounter < alphabetSize)
-		return 'A' + partCounter++;
-	return '0';
+	return pw.mountPart(part);
 }
 
-char KernelFS::kunmount(char partName){
-	PartNum partIndex = partName - 'A';
-	if(partInter[partIndex].part){
+char KernelFS::kunmount(char part){
+	if(pw.checkMount(part)){
 		enterCriticalSection(partIndex);
-		partInter[partIndex].part = nullptr;
+		pw.unMountPart(part);
 		return 1;
 	}
 	return 0;
 }
 
 char KernelFS::kformat(char partName){
-	PartNum partIndex = partName - 'A';
-	if(partInter[partIndex].part){
+	if(pw.checkMount()){
 		enterCriticalSection(partIndex);
 		Partition *part = partInter[partIndex].part;
 		std::memset(buffer,1,ClusterSize);
@@ -74,10 +70,10 @@ char KernelFS::kreadRootDir(char partName, EntryNum entryNum,Directory &dir){
 	std::memset(buffer,0,ClusterSize);
 	part->readCluster(partInter[partIndex].dirIndex,buffer);
 	std::memcpy(dir,buffer,ClusterSize);
-	char counter;
+	char counter = 0;
 	//TO DO: faster search -> log saerch
 	for(int i = entryNum; i < ENTRYCNT; i++)
-		if(myDir[i].name != 0)
+		if(myDir[i].name[0] != '\0')
 			dir[counter++] = myDir[i];
 	if(counter < 64)
 		return 0;
@@ -87,7 +83,7 @@ char KernelFS::kreadRootDir(char partName, EntryNum entryNum,Directory &dir){
 File* KernelFS::kopen(char* fpath, char mode){
 	PartNum partIndex;
 	char *fname;
-	Partition *part;
+	Partition *part = nullptr;
 	char index = -1;
 	File *file;
 	FCB* newFCB;
@@ -117,27 +113,25 @@ File* KernelFS::kopen(char* fpath, char mode){
 			//1)findEntry
 			partIndex = fpath[0] - 'A';
 			fname = getFileName(fpath);
-			Partition* part = partInter[partIndex].part;
+			part = partInter[partIndex].part;
 			enterCriticalSection(partIndex,fname);
 			std::memset(buffer,0,ClusterSize);
 			part->readCluster(partInter[partIndex].dirIndex, buffer);
 			std::memcpy(myDir,buffer,sizeof myDir);
 			for(char i = 0; i < ENTRYCNT; i++)
 				//2)findEntry
-				if(myDir[i].name == 0){
+				if(myDir[i].name[0] == '\0'){
 					//3)loadAtributes
-					myDir[index = i].name = getName(fname);
-					myDir[index].ext = getExt(fname);
+					strcpy(myDir[index = i].name, getName(fname));
+					strcpy(myDir[index].ext, getExt(fname));
 					myDir[index].indexCluster = partInter[partIndex].dirIndex + 1;
 					myDir[index].size = ClusterSize;
 				}
 				else if(myDir[i].name == fname){
 					kdelete(fpath);
-					if(index > 0){
-						myDir[index].name = 0;
+					//myDir[index].name[0] = '\0';
 					return nullptr;
 					}
-				}
 			if(index < 0)
 				return nullptr;
 			std::memcpy(buffer,myDir,sizeof myDir);

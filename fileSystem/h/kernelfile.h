@@ -1,9 +1,9 @@
 //File : kernelfile.h
 #ifndef _kernelfile_h_
 #define _kernelfile_h_
-#include "file.h"
 #include "mutex.h"
 #include "windows.h"
+#include "kernelfs.h"
 
 #define signal(x) ReleaseSemaphore(x,1,NULL)
 #define wait(x) WaitForSingleObject(x,INFINITE)
@@ -11,6 +11,7 @@
 class KernelFile{
 	private:
 		friend class File;
+		friend class KernelFS;
 
 		struct IndexClusterFirst{
 			ClusterNo dataCluster[1024];
@@ -33,9 +34,6 @@ class KernelFile{
 		BytesCnt getFileSize();
 		char truncate();
 		void setID(unsigned long);
-
-		friend char KernelFS::kopen(char*,char);
-
 	public:
 		~KernelFile();
 };
