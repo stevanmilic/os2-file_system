@@ -5,14 +5,6 @@
 
 KernelFS* KernelFS::onlySample = nullptr;
 
-KernelFS::KernelFS(){
-	pw = PartWrapper::sample();
-}
-
-KernelFS::~KernelFS(){
-	delete [] buffer;
-}
-
 KernelFS* KernelFS::sample(){
 	if(onlySample == nullptr) 
 		onlySample = new KernelFS();
@@ -20,39 +12,47 @@ KernelFS* KernelFS::sample(){
 }
 
 char KernelFS::kmount(Partition *part){
-	return pw.mountPart(part);
+	if(pt.fillRatio() == 1)
+		return '0';//exception: full on part
+	PartWrapper* pw = new PartWrapper(part);
+	pt.insertKey(pw->getID(), pw);
+	return pw->getName();
 }
 
 char KernelFS::kunmount(char part){
-	if(pw.checkMount(part)){
-		enterCriticalSection(part);
-		pw.unMountPart(part);
-		return 1;
-	}
-	return 0;
+	if(pt.findKey(PartWrapper::toNumber(part) == 0)
+		return 0;//excep: part with this part name doesn't exist
+	enterCriticalSection(part);
+	pt.deleteKey(PartWrapper::toNumber(part));
+	return 1;
 }
 
-char KernelFS::kformat(char partName){
-	if(pw.checkMount()){
-		enterCriticalSection(part);
-		Partition *part = partInter[partIndex].part;
+char KernelFS::kformat(char part){
+	pw = pt.findKey(PartWrapper::toNumber(part);
+	if(pw == 0)
+		return 0;//excep: part with this part name doesn't exist
+	enterCriticalSection(part);
+	pw->clearBitVector();
+	pw->clearDir();
+	return 1;
+	/*use this for cache implementation
+	Partition *part = partInter[partIndex].part;
+	std::memset(buffer,1,ClusterSize);
+	unsigned long bvClusters = part->getNumOfClusters()/ClusterSize + part->getNumOfClusters() % ClusterSize ? 1 : 0;//if number of clusters exceeds clustersize
+	partInter[partIndex].dirIndex = bvClusters + 1;// + 1 for dir index
+	std::memset(buffer,0,partInter[partIndex].dirIndex);
+	for(unsigned long i = 0; i < partInter[partIndex].dirIndex; i++){
+		part->writeCluster(i, buffer);
 		std::memset(buffer,1,ClusterSize);
-		unsigned long bvClusters = part->getNumOfClusters()/ClusterSize + part->getNumOfClusters() % ClusterSize ? 1 : 0;//if number of clusters exceeds clustersize
-		partInter[partIndex].dirIndex = bvClusters + 1;// + 1 for dir index
-		std::memset(buffer,0,partInter[partIndex].dirIndex);
-		for(unsigned long i = 0; i < partInter[partIndex].dirIndex; i++){
-			part->writeCluster(i, buffer);
-			std::memset(buffer,1,ClusterSize);
-		}
-		std::memset(buffer,0,ClusterSize);
-		std::memcpy(buffer,myDir,sizeof myDir);
-		part->writeCluster(partInter[partIndex].dirIndex,buffer);// if write = 1
-		return 1;
 	}
-	return 0;
+	std::memset(buffer,0,ClusterSize);
+	std::memcpy(buffer,myDir,sizeof myDir);
+	part->writeCluster(partInter[partIndex].dirIndex,buffer);// if write = 1*/
 }
 
 char KernelFS::kexist(char* fname){
+	//TO DO:
+	//implement with partWrapper
 	std::memset(buffer,0,ClusterSize);
 	for(int i = 0; i < partCounter; i++){
 		partInter[i].part->readCluster(partInter[i].dirIndex,buffer);
@@ -65,6 +65,8 @@ char KernelFS::kexist(char* fname){
 }
 
 char KernelFS::kreadRootDir(char partName, EntryNum entryNum,Directory &dir){
+	//TO DO:
+	//implement with partWrapper
 	PartNum partIndex = partName - 'A';
 	Partition* part = partInter[partIndex].part;
 	std::memset(buffer,0,ClusterSize);
@@ -81,6 +83,9 @@ char KernelFS::kreadRootDir(char partName, EntryNum entryNum,Directory &dir){
 }
 
 File* KernelFS::kopen(char* fpath, char mode){
+	//TO DO:
+	//implement with partWrapper
+	//implement with FCBtable
 	PartNum partIndex;
 	char *fname;
 	Partition *part = nullptr;

@@ -4,21 +4,14 @@
 #include "fs.h"
 #include "file.h"
 #include "windows.h"
-#include "list.h"
+#include "partwrapper.h"
+#include "fcb.h"
+
 
 #define signal(x) ReleaseSemaphore(x,1,NULL)
 #define wait(x) WaitForSingleObject(x,INFINITE)
 
-typedef unsigned long fcbID;
-const PartNum alphabetSize = 26;
-
-struct FCB{
-	Entry entry;
-	PartNum partNum;
-	EntryNum entryNum;
-	BytesCnt cursor;
-	FCB(Entry e, PartNum pn,EntryNum en, BytesCnt bc) : entry(e), partNum(pn), entryNum(en), cursor(bc) {}
-};
+const char ALPHASIZE = 26;
 
 
 class KernelFS{
@@ -29,10 +22,9 @@ class KernelFS{
 
 		HANDLE sem;
 
-		static PartWrapper *pw;
-		fcbID fcbCounter;
+		HashTable<PartWrapper*> pt(ALPHASIZE);
+		HashTable<FCB*> ft(ENTRYCNT);
 		Directory myDir;
-		List<FCB*> openedFiles;
 
 		static KernelFS* onlySample;
 		static KernelFS* sample();
@@ -47,10 +39,6 @@ class KernelFS{
 		char kclose(fcbID);
 
 		void enterCriticalSection(PartNum,char* fname = nullptr);
-		char* getFileName(char*);
-		char* getName(char*);
-		char* getExt(char*);
-
 	public:
 		~KernelFS();
 };

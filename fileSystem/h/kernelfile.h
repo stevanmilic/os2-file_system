@@ -8,21 +8,15 @@
 #define signal(x) ReleaseSemaphore(x,1,NULL)
 #define wait(x) WaitForSingleObject(x,INFINITE)
 
+typedef unsigned long FCB_ID;
+
 class KernelFile{
 	private:
 		friend class File;
 		friend class KernelFS;
 
-		struct IndexClusterFirst{
-			ClusterNo dataCluster[1024];
-			ClusterNo indexCluster[1024];
-		};
-
-		struct IndexClusterSecond{
-			ClusterNo dataCluster[ClusterSize];
-		};
-
 		HANDLE sem;
+		HashTable<FCB_ID> openedFiles;
 
 		KernelFile();
 		
