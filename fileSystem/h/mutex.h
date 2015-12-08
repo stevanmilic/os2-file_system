@@ -8,7 +8,7 @@
 
 class Mutex{
 	public:
-		Mutex(HANDLE*);
+		Mutex(HANDLE);
 		~Mutex();
 	private:
 		HANDLE *sem;

@@ -1,26 +1,21 @@
 //File: partwrapper.h
 #ifndef _partwrapper_h_
 #define _partwrapper_h_
-#include "part.h"
+#include "cache.h"
 //TO DO:
 //use cache wisely :)
 
 class PartWrapper{
-	Partition* part;
-	Cache *cache;
+	Cache* cache;
 	
-	static char pos_id;//default 0
+	static char posID;//default 0
 	char id = posID++;
 	char name = 'A' + id;
 public:
-	PartWrapper(Partition* part){
-		this->part = part;
+	PartWrapper(Cache* cache){
+		this->cache = cache;
 	}
 	
-	Partition* getPart(){
-		return part;
-	}
-
 	char getID(){
 		return id;
 	}
@@ -33,10 +28,36 @@ public:
 		return partName - 'A';
 	}
 
-	static char getPartName(char *fpath){
+	//get partition name from fpath
+	static char parseName(char *fpath){
 		if(fpath == nullptr)
 			return '0';
-		return fpath[0];
+		return fpath[0] - 'A';
+	}
+
+	void clear(){
+		cache->clearBitVector();
+		cache->clearDir();
+	}
+
+	Directory* rootDir(){
+		return cache->getDir();
+	}
+
+	bool raed(char* buffer){
+		return cache->readFromCluster(buffer);
+	}
+
+	bool write(char* buffer){
+		return cache->writeToCluster(buffer);
+	}
+
+	ClusterNo cluster(){
+		return cache->nextCluster();
+	}
+
+	void fopen(unsigned long fcbid){
+		cache->newFileCache(fcbid);
 	}
 };
 #endif

@@ -24,7 +24,6 @@ class KernelFS{
 
 		HashTable<PartWrapper*> pt(ALPHASIZE);
 		HashTable<FCB*> ft(ENTRYCNT);
-		Directory myDir;
 
 		static KernelFS* onlySample;
 		static KernelFS* sample();
@@ -37,6 +36,10 @@ class KernelFS{
 		File* kopen(char*,char);
 		char kdelete(char*); 
 		char kclose(fcbID);
+
+		File* newFileOpened(PartWrapper*,char*,char index,char);
+		File* startReading(char*,char);
+		File* startWriting(char*);
 
 		void enterCriticalSection(PartNum,char* fname = nullptr);
 	public:

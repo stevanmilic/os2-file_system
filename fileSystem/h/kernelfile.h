@@ -27,7 +27,7 @@ class KernelFile{
 		char eof();
 		BytesCnt getFileSize();
 		char truncate();
-		void setID(unsigned long);
+		void addFCB_ID(FCB_ID);
 	public:
 		~KernelFile();
 };
