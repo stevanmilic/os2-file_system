@@ -11,6 +11,6 @@ class Mutex{
 		Mutex(HANDLE);
 		~Mutex();
 	private:
-		HANDLE *sem;
+		HANDLE sem;
 };
 #endif

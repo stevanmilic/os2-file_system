@@ -1,19 +1,22 @@
 //File: partwrapper.h
 #ifndef _partwrapper_h_
 #define _partwrapper_h_
+#include "part.h"
 #include "cache.h"
 //TO DO:
 //use cache wisely :)
 
 class PartWrapper{
 	Cache* cache;
+	Partition *part;
 	
 	static char posID;//default 0
 	char id = posID++;
 	char name = 'A' + id;
 public:
-	PartWrapper(Cache* cache){
-		this->cache = cache;
+	PartWrapper(Partition* part)
+		this->part = part;
+		cache = new Cache(part);
 	}
 	
 	char getID(){
@@ -38,26 +41,29 @@ public:
 	void clear(){
 		cache->clearBitVector();
 		cache->clearDir();
+		//TO DO :cache->clearCacheBlocks();
 	}
 
-	Directory* rootDir(){
+	Directory rootDir(){
 		return cache->getDir();
 	}
 
-	bool raed(char* buffer){
-		return cache->readFromCluster(buffer);
+	void raed(char* buffer, ID fcbID, ClusterNo readCluster){
+		readBlock(buffer,fcbID,readCluster);	
 	}
 
-	bool write(char* buffer){
-		return cache->writeToCluster(buffer);
+	ClusterNo write(char* buffer,ID fcbID){
+		ClusterNo writtenCluster = cache->findFreeBlock();
+		cache->writeBlock(buffer,fcbID,writtenCluster);
+		return writtenCluster;
 	}
 
 	ClusterNo cluster(){
-		return cache->nextCluster();
+		return cache->findFreeBlock();
 	}
 
-	void fopen(unsigned long fcbid){
-		cache->newFileCache(fcbid);
+	void fopen(ID fcbID){
+		cache->newFileCache(fcbID);
 	}
 };
 #endif

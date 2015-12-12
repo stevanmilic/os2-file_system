@@ -1,24 +1,10 @@
 //File: cache.h
 #ifndef _cache_h_
 #define _cache_h_
-#include "part.h"
 #include "hashtable.h"
+#include "part.h"
 #include "lru.h"
 
-struct tagMem{
-	ClusterNo index;
-}
-
-struct dataMem{
-	char* data;
-}
-
-struct set{
-	tagMem tm;
-	dataMem dm;
-	char valid;
-	char dirty;
-};
 
 typedef unsigned long ID;
 class Cache{
@@ -31,27 +17,34 @@ class Cache{
 //Cache holds valuable data in program memory, so it's easy to access clusters
 //Writing and Reading could be done(delayed) in sepate thread
 //size of cache depends on size of file, formula?
-
+	
 	HashTable<LRU*> lt(64);
+	CacheBlock** cbs;
 	Directory dir;
-
-	Partition *part;
 	char* bitVector;
-	ClusterNo dirIndex;
+	ClusterNo numOfBlocks;
+	Partition *part;
 
-	ClusterNo bvClustersNum(){
+	ClusterNo bvSize();
 public:
-	Cache(Partition *part);
+	Cache(Partition*);
 
-	Directory* getDir(){
-		return &dir;
+	Directory getDir(){
+		return dir;
 	}
 
-	bool readFromCluster(char*,ID,ClusterNo);
-	bool writeToCluster(char*,ID,ClusterNo);
-	ClusterNo nextCluster();
+	char* getBitVector(){
+		return bitVector;
+	}
+
+	void readBlock(char*,ID,ClusterNo);
+	void writeBlock(char*,ID,ClusterNo);
+	void readBitVector();
+	void readDir(Directory)
 	void clearBitVector();
 	void clearDir();
 	void newFileCache(ID);
+	void closeFileCache(ID);
+	ClusterNo findFreeBlock();
 };
 #endif
