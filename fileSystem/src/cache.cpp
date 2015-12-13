@@ -1,9 +1,9 @@
 //File: cache.cpp
 #include "cache.h"
 
-Cache::Cache(Partition* part){
+Cache::Cache(Partition* part) : lt(64){
 	this->part = part;
-	cbs = new (CacheBlock*)[part->numOfBlocks() = numOfBlocks];
+	cbs = new CacheBlock*[part->getNumOfClusters()];
 	readBitVector();
 	readDir();
 }
@@ -21,7 +21,7 @@ void Cache::newFileCache(ID fcbid){
 ClusterNo Cache::findFreeBlock(){
 	//TO DO: write better search algortithm!
 	ClusterNo blockNo;
-	for(ClusterNo i = 0;i <= numOfBlocks; i++)
+	for(ClusterNo i = 0;i <= part->getNumOfClusters(); i++)
 		if(bitVector[i] == 0){
 			blockNo = i;
 			bitVector[i] = 1;//project specification says otherwise? :)
@@ -29,12 +29,12 @@ ClusterNo Cache::findFreeBlock(){
 	return blockNo;
 }
 
-void Cache::writeBlock(char* buffer, ID fcbID, ClusterNo blockNo){
+bool Cache::writeBlock(char* buffer, ID fcbID, ClusterNo blockNo){
 	LRU* lru = lt.findKey(fcbID);
 	if(lru == 0)
-		return -1;//file not found?
+		return 0;//file not found?
 
-	CacheBlock* block = lru->hitPage(blockNo);
+	CacheBlock* block = lru->hitPage(blockNo,1);
 
 	if(block == nullptr){
 		lru->loadPage(blockNo);
@@ -42,12 +42,13 @@ void Cache::writeBlock(char* buffer, ID fcbID, ClusterNo blockNo){
 	}
 		
 	block->setData(buffer);
+	return 1;
 }
 
-void Cache::readBlock(char* buffer, ID fcbID, ClusterNo blockNo){
+bool Cache::readBlock(char* buffer, ID fcbID, ClusterNo blockNo){
 	LRU *lru = lt.findKey(fcbID);
 	if(lru == 0)
-		return -1;//file not found?
+		return 0;//file not found?
 
 
 	CacheBlock* block = lru->hitPage(blockNo,0);
@@ -57,6 +58,7 @@ void Cache::readBlock(char* buffer, ID fcbID, ClusterNo blockNo){
 	}
 	
 	block->readData(buffer);
+	return 1;
 }
 
 void Cache::clearBitVector(){
@@ -68,22 +70,22 @@ void Cache::clearDir(){
 }
 
 void Cache::readBitVector(){
-	Cluster blockNo = 0;//bitVector position
-	CacheBlock* block = lru->hitPage(blockNo,0);
+	ClusterNo blockNo = 0;//bitVector position
+	CacheBlock* block = partLRU->hitPage(blockNo,0);
 	if(block == nullptr){
-		lru->loadPage(blockNo);
-		block = lru->hitPage(blockNo,0);
+		partLRU->loadPage(blockNo);
+		block = partLRU->hitPage(blockNo,0);
 	}
 
 	bitVector = block->getData();
 }
 
 void Cache::readDir(){
-	Cluster blockNo = 1;//bitVector position
-	CacheBlock* block = lru->hitPage(blockNo,0);
+	ClusterNo blockNo = 1;//bitVector position
+	CacheBlock* block = partLRU->hitPage(blockNo,0);
 	if(block == nullptr){
-		lru->loadPage(blockNo);
-		block = lru->hitPage(blockNo,0);
+		partLRU->loadPage(blockNo);
+		block = partLRU->hitPage(blockNo,0);
 	}
 
 	//TO DO: char to dir(ENTRY[64])

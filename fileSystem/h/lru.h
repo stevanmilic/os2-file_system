@@ -12,12 +12,21 @@ class LRU{
 	Partition *part;
 
 public:
-	LRU(CacheBlock **cbs,Partition *part)
+	LRU(CacheBlock **cbs,Partition *part){
 		this->cbs = cbs;
 		this->part = part;
 	}
 
-	//TO DO: write copy and move constructor, and destructor
+	~LRU(){
+		while(firstAccessed != lastAccessed){
+			CacheBlock* old = firstAccessed;
+			firstAccessed = firstAccessed->next;
+			cbs[old->blockNo] = nullptr;
+			delete old;
+		}
+	}
+
+	//TO DO: write copy and move constructor
 
 	void loadPage(ClusterNo blockNo){
 		if(victim < cacheSize)
@@ -40,6 +49,9 @@ public:
 			cbs[blockNo] = new CacheBlock(blockNo,part);
 		else
 			cbs[blockNo]->initData();
+
+		if(lastAccessed == nullptr)
+			lastAccessed = cbs[blockNo];
 
 		cbs[blockNo]->next = firstAccessed;
 		firstAccessed->prev = cbs[blockNo];

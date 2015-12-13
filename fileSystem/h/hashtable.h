@@ -2,7 +2,6 @@
 #define _hashtable_h_
 
 #include "quadratichashing.h"
-#include <iostream>
 using namespace std;
 using Key = int;
 enum State{Empty, Deleted, Full};
@@ -176,6 +175,7 @@ template <class T> bool HashTable<T>::deleteKey(Key k){
     } 
     if(table[j]->k == k){
       table[j]->a = Deleted;
+			delete table[j]->dat;
       return 1;
     } 
     else{

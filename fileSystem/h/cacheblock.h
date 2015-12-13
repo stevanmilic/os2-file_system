@@ -2,6 +2,7 @@
 #ifndef _cacheblock_h_
 #define _cacheblock_h_
 #include "part.h"
+#include <cstring>
 
 class LRU;
 
@@ -16,7 +17,7 @@ class CacheBlock{
 
 	void writeToPartition(){
 		//TO DO:write in a new thread
-		part->writeCluster(data,blockNo);
+		part->writeCluster(blockNo,data);
 	}
 
 	void deleteData(){
@@ -26,7 +27,7 @@ class CacheBlock{
 	void initData(){
 		data = new char[ClusterSize];
 		//TO DO:read in a new thread
-		part->readCluster(data,this->blockNo = blockNo);
+		part->readCluster(this->blockNo = blockNo,data);
 	}
 
 	CacheBlock(ClusterNo blockNo,Partition *part){
@@ -43,11 +44,15 @@ public:
 	//write copy and move constructor
 
 	void setData(char* buffer){
-		memcpy(data,buffer,ClusterSize);
+		std::memcpy(data,buffer,ClusterSize);
 	}
 
 	void readData(char* buffer){
-		memcpy(buffer, data, ClusterSize);
+		std::memcpy(buffer, data, ClusterSize);
+	}
+
+	char* getData(){
+		return data;
 	}
 };
 #endif

@@ -14,7 +14,7 @@ class PartWrapper{
 	char id = posID++;
 	char name = 'A' + id;
 public:
-	PartWrapper(Partition* part)
+	PartWrapper(Partition* part){
 		this->part = part;
 		cache = new Cache(part);
 	}
@@ -44,12 +44,12 @@ public:
 		//TO DO :cache->clearCacheBlocks();
 	}
 
-	Directory rootDir(){
+	Directory* rootDir(){
 		return cache->getDir();
 	}
 
 	void raed(char* buffer, ID fcbID, ClusterNo readCluster){
-		readBlock(buffer,fcbID,readCluster);	
+		cache->readBlock(buffer,fcbID,readCluster);	
 	}
 
 	ClusterNo write(char* buffer,ID fcbID){

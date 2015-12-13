@@ -16,7 +16,6 @@ char FS::format(char part){
 }
 
 char FS::readRootDir(char part, EntryNum n,Directory &d){
-	//ako se var d prenosi po referenci onda bi trebalo dalje da pokazuje kao pointer... implementirati :)
 	return myImpl->kreadRootDir(part,n,d);
 }
 

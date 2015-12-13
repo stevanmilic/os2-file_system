@@ -13,20 +13,18 @@ class FCB{
 	static ID posID;//default 0
 	ID id = posID++;
 
-	public:
-		FCB(char part, EntryNum entryNum, char mode){
-			this->entry = entry;
-			this->part = part;
-			this->entryNum = entryNum;
-			this->mode = mode;
-		}
+public:
+	FCB(char part, EntryNum entryNum, char mode){
+		this->part = part;
+		this->entryNum = entryNum;
+		this->mode = mode;
+	}
 
-		ID getID(){
-			return id;
-		}
+	ID getID(){
+		return id;
+	}
 
-		static char* parseName(char *fpath);//get name of the file from absolute path
-		static char* parseExt(char *fpath);//get ext of the file from absolute path
-
+	static char* parseName(char *fpath);//get name of the file from absolute path
+	static char* parseExt(char *fpath);//get ext of the file from absolute path
 };
 #endif
