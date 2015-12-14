@@ -3,11 +3,6 @@
 #define _kernelfile_h_
 #include "kernelfs.h"
 
-/*#include "windows.h"
-#include "mutex.h"
-#define signal(x) ReleaseSemaphore(x,1,NULL)
-#define wait(x) WaitForSingleObject(x,INFINITE)*/
-
 typedef unsigned long FCB_ID;
 
 class KernelFile{
@@ -15,8 +10,7 @@ class KernelFile{
 		friend class File;
 		friend class KernelFS;
 
-		//HANDLE sem;
-		HashTable<FCB_ID> openedFiles;
+		FCB_ID id;
 
 		KernelFile();
 		

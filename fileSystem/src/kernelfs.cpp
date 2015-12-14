@@ -2,7 +2,6 @@
 #include "kernelfs.h"
 #include "kernelfile.h"
 #include "cache.h"
-#include <iostream>
 
 KernelFS* KernelFS::onlySample = nullptr;
 
@@ -24,9 +23,9 @@ char KernelFS::kmount(Partition *part){
 }
 
 char KernelFS::kunmount(char part){
-	if(pt.findKey(PartWrapper::toNumber(part) == 0))
+	PartWrapper* pw = pt.findKey(PartWrapper::toNumber(part) == 0);
+	if(pw == 0)
 		return 0;//excep: part with this part name doesn't exist
-	enterCriticalSection(part);
 	pt.deleteKey(PartWrapper::toNumber(part));
 	return 1;
 }
@@ -35,21 +34,20 @@ char KernelFS::kformat(char part){
 	PartWrapper*  pw = pt.findKey(PartWrapper::toNumber(part));
 	if(pw == 0)
 		return 0;//excep: part with this part name doesn't exist
-	enterCriticalSection(part);
 	pw->clear();
 	return 1;
 }
 
-char KernelFS::kexist(char* fname){
+EntryNum KernelFS::kexist(char* fname){
 	PartWrapper* pw = pt.findKey(PartWrapper::parseName(fname));
 	if(pw == 0)
-		return -1;//excep: partition doesn't exist
+		return 65;//excep: partition doesn't exist
 	Directory *myDir = pw->rootDir();
 	fname = FCB::parseName(fname);	
-	for(int j = 0;j < ENTRYCNT; j++)
-		if(myDir[j]->name == fname)
+	for(EntryNum j = 0;j < ENTRYCNT; j++)
+		if(strcmp(myDir[j]->name,fname) == 0)
 			return j;//file found with given index
-	return -2;//file not found
+	return 64;//file not found
 }
 
 char KernelFS::kreadRootDir(char part, EntryNum entryNum,Directory &dir){
@@ -77,47 +75,61 @@ File* KernelFS::newFileOpened(PartWrapper* pw, char* fpath, char index, char mod
 }
 
 File* KernelFS::startReading(char *fpath,char mode){
-	char index = kexist(fpath);
-	if(index < 0)
+	EntryNum index = kexist(fpath);
+	if(index > 63)
 		return nullptr;//excep: file not found or no part with given name
 	PartWrapper* pw = pt.findKey(PartWrapper::parseName(fpath));
+	if(pw->getFormat())
+		return nullptr;
+	if(mode == 'r')
+		pw->startReading(index);
+	else
+		pw->startWriting(index);
 	return newFileOpened(pw, fpath, index, mode);
 }
 
 File* KernelFS::startWriting(char* fpath){
-	char index = kexist(fpath);
-	if(index == -1)
+	EntryNum index = kexist(fpath);
+	if(index == 65)
 		return nullptr;//excep:: no partition with given name
-	else if(index >= 0){
+	else if(index <= 63){
 		kdelete(fpath);
 		return nullptr;//excep: file exists and it's deleted
 	}
 		
 	PartWrapper* pw = pt.findKey(PartWrapper::parseName(fpath));
+
+	if(pw->getFormat())
+		return nullptr;
+
 	Directory *myDir = pw->rootDir();	
+
 	
-	for(char i = 0; i < ENTRYCNT; i++)
+	for(EntryNum i = 0; i < ENTRYCNT; i++)
 		if(myDir[i]->name[0] == '\0'){
 			strcpy(myDir[index = i]->name, FCB::parseName(fpath));
 			strcpy(myDir[index]->ext, FCB::parseExt(fpath));
 			myDir[index]->indexCluster = pw->cluster();
 			myDir[index]->size = ClusterSize;
+			break;
 		}
+
+	if(index == 64)
+		return nullptr; //excep: directory full
+
+	pw->startWriting(index);
 	return newFileOpened(pw, fpath, index, 'w');
 }
 
 File* KernelFS::kopen(char* fpath, char mode){
 	switch(mode){
 		case 'r':
-			enterCriticalSection(PartWrapper::parseName(fpath),FCB::parseName(fpath));
 			return startReading(fpath,mode);
 			break;
 		case 'w':
-			enterCriticalSection(PartWrapper::parseName(fpath),FCB::parseName(fpath));
 			return startWriting(fpath);
 			break;
 		case 'a':
-			enterCriticalSection(PartWrapper::parseName(fpath),FCB::parseName(fpath));
 			return startReading(fpath,mode);
 			break;
 		default:

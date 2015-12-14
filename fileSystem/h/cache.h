@@ -15,13 +15,14 @@ class Cache{
 	Partition *part;
 	CacheBlock** cbs;
 	LRU* partLRU;
-	HashTable<LRU*> lt;
+	HashTable<LRU*,ID> lt;
 	Directory dir;
 	char* bitVector;
 
 	ClusterNo bvSize();
 public:
 	Cache(Partition*);
+	~Cache();
 
 	Directory* getDir(){
 		return &dir;
@@ -33,8 +34,8 @@ public:
 
 	bool readBlock(char*,ID,ClusterNo);
 	bool writeBlock(char*,ID,ClusterNo);
-	void readBitVector();
-	void readDir();
+	void readWriteBitVector();
+	void readWriteDir(char);
 	void clearBitVector();
 	void clearDir();
 	void newFileCache(ID);

@@ -2,11 +2,10 @@
 #define _hashtable_h_
 
 #include "quadratichashing.h"
-using namespace std;
-using Key = int;
 enum State{Empty, Deleted, Full};
 
-template <class T> class HashTable{
+template <class T,class K> class HashTable{
+	using Key = K;
   struct Elem{
     Key k;
     T dat;
@@ -85,7 +84,7 @@ public:
 
 #include "addressfunction.h"
 
-template <class T> void HashTable<T>::write(ostream& it) const{
+template <class T,class K> void HashTable<T,K>::write(ostream& it) const{
   for(int i = 0; i < n;i++)
     if(table[i]->a == Full)
       it << table[i]->k << " -> " << table[i]->s << endl;
@@ -93,31 +92,31 @@ template <class T> void HashTable<T>::write(ostream& it) const{
       it << "EMPTY" << endl;
 } 
 
-template <class T> void HashTable<T>::copy(const HashTable<T>& ht){
+template <class T,class K> void HashTable<T,K>::copy(const HashTable<T,K>& ht){
   n = ht.n;
   table = new Elem*[n];
   for(int i = 0;i < n;i++)
     table[i] = new Elem(ht.table[i]);
 } 
 
-template <class T> void HashTable<T>::move(HashTable<T>& ht){
+template <class T,class K> void HashTable<T,K>::move(HashTable<T,K>& ht){
   table = ht.table;
   n = ht.n;
   ht.table = nullptr;
 } 
 
-template <class T> void HashTable<T>::deleteTable(){
+template <class T,class K> void HashTable<T,K>::deleteTable(){
   for(int i = 0; i < n; i++)
     delete table[i];
   delete [] table;
   table = nullptr;
 } 
 
-template <class T> int HashTable<T>::h(Key k){
+template <class T,class K> int HashTable<T,K>::h(Key k){
   return k % n;
 } 
 
-template <class T> T HashTable<T>::findKey(Key k){
+template <class T,class K> T HashTable<T,K>::findKey(Key k){
   int i = 0, j, t = 0;
   int a = h(k);
   do{
@@ -138,7 +137,7 @@ template <class T> T HashTable<T>::findKey(Key k){
   return 0;
 } 
 
-template <class T> Key HashTable<T>::insertKey(Key k, T d){
+template <class T,class K> Key HashTable<T,K>::insertKey(Key k, T d){
   int i = 0, j, t = 0;
   int a = h(k);
   do{
@@ -163,7 +162,7 @@ template <class T> Key HashTable<T>::insertKey(Key k, T d){
   return 0;
 } 
 
-template <class T> bool HashTable<T>::deleteKey(Key k){
+template <class T,class K> bool HashTable<T,K>::deleteKey(Key k){
   int i = 0, j, t = 0;
   int a = h(k);
   do{
@@ -186,20 +185,20 @@ template <class T> bool HashTable<T>::deleteKey(Key k){
   return 0;
 } 
 
-template <class T> void HashTable<T>::clear(){
+template <class T,class K> void HashTable<T,K>::clear(){
   for(int i = 0; i < n; i++)
     table[i]->a = Empty;
 } 
 
-template <class T> int HashTable<T>::keyCount() const{
+template <class T,class K> int HashTable<T,K>::keyCount() const{
   return keysInserted;
 } 
 
-template <class T> int HashTable<T>::tableSize() const{
+template <class T,class K> int HashTable<T,K>::tableSize() const{
   return n;
 } 
 
-template <class T> double HashTable<T>::fillRatio() const{
+template <class T,class K> double HashTable<T,K>::fillRatio() const{
   return (double)keysInserted/n;
 } 
 #endif

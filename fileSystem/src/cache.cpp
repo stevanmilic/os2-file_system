@@ -4,8 +4,15 @@
 Cache::Cache(Partition* part) : lt(64){
 	this->part = part;
 	cbs = new CacheBlock*[part->getNumOfClusters()];
-	readBitVector();
-	readDir();
+	partLRU = new LRU(cbs,part);
+	readWriteBitVector();
+	readWriteDir(0);//read dir from part
+}
+
+Cache::~Cache(){
+	readWriteDir(1);//write dir to part
+	delete partLRU;
+	//hashtable deletes all file cache lru's, and writes cache blocks to part
 }
 
 /*ClusterNo Cache::bvSize(){
@@ -62,34 +69,35 @@ bool Cache::readBlock(char* buffer, ID fcbID, ClusterNo blockNo){
 }
 
 void Cache::clearBitVector(){
-	memset(bitVector,0,sizeof bitVector);
+	memset(bitVector,0,ClusterSize);
 }
 
 void Cache::clearDir(){
-	memset(dir,0,sizeof dir);
+	memset(dir,0,ClusterSize);
 }
 
-void Cache::readBitVector(){
+void Cache::readWriteBitVector(){
 	ClusterNo blockNo = 0;//bitVector position
-	CacheBlock* block = partLRU->hitPage(blockNo,0);
+	CacheBlock* block = partLRU->hitPage(blockNo,1);
 	if(block == nullptr){
 		partLRU->loadPage(blockNo);
-		block = partLRU->hitPage(blockNo,0);
+		block = partLRU->hitPage(blockNo,1);
 	}
-
 	bitVector = block->getData();
 }
 
-void Cache::readDir(){
-	ClusterNo blockNo = 1;//bitVector position
-	CacheBlock* block = partLRU->hitPage(blockNo,0);
+void Cache::readWriteDir(char write){
+	ClusterNo blockNo = 1;//dir position
+	CacheBlock* block = partLRU->hitPage(blockNo,write);
 	if(block == nullptr){
 		partLRU->loadPage(blockNo);
-		block = partLRU->hitPage(blockNo,0);
+		block = partLRU->hitPage(blockNo,write);
 	}
 
-	//TO DO: char to dir(ENTRY[64])
-	//dir = block->getData();
+	if(!write)
+		memcpy(dir,block->getData(),ClusterSize);
+	else
+		memcpy(block->getData(),dir,ClusterSize);
 }
 
 void Cache::closeFileCache(ID fcbID){

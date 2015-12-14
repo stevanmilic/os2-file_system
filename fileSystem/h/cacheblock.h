@@ -24,7 +24,7 @@ class CacheBlock{
 		delete [] data;
 	}
 
-	void initData(){
+	void initData(ClusterNo blockNo){
 		data = new char[ClusterSize];
 		//TO DO:read in a new thread
 		part->readCluster(this->blockNo = blockNo,data);
@@ -32,7 +32,7 @@ class CacheBlock{
 
 	CacheBlock(ClusterNo blockNo,Partition *part){
 		this->part = part;
-		initData();
+		initData(blockNo);
 	}
 public:
 	~CacheBlock(){

@@ -6,13 +6,7 @@
 #include "partwrapper.h"
 #include "fcb.h"
 
-
-/*#include "windows.h"
-#define signal(x) ReleaseSemaphore(x,1,NULL)
-#define wait(x) WaitForSingleObject(x,INFINITE)*/
-
 const char ALPHASIZE = 26;
-
 
 class KernelFS{
 	protected:
@@ -20,10 +14,8 @@ class KernelFS{
 	private:
 		friend class FS;
 
-		//HANDLE sem;
-
-		HashTable<PartWrapper*> pt;
-		HashTable<FCB*> ft;
+		HashTable<PartWrapper*,char> pt;
+		HashTable<FCB*,unsigned long> ft;
 
 		static KernelFS* onlySample;
 		static KernelFS* sample();
@@ -31,7 +23,7 @@ class KernelFS{
 		char kmount(Partition*);
 		char kunmount(char);
 		char kformat(char);
-		char kexist(char*);
+		EntryNum kexist(char*);
 		char kreadRootDir(char,EntryNum,Directory&);
 		File* kopen(char*,char);
 		char kdelete(char*); 
@@ -39,8 +31,6 @@ class KernelFS{
 		File* newFileOpened(PartWrapper*,char*,char,char);
 		File* startReading(char*,char);
 		File* startWriting(char*);
-
-		void enterCriticalSection(char,char* fname = nullptr);
 	public:
 		~KernelFS();
 };
