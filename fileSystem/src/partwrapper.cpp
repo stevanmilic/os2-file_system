@@ -38,7 +38,7 @@ void PartWrapper::fopen(ID fcbID){
 
 void PartWrapper::fclose(ID fcbID){
 	cache->closeFileCache(fcbID);
-	if(rwt.fillRatio() == 0)
+	if(rwt.fillRatio() == 0.0)
 		LeaveCriticalSection(&csPart);
 		;
 }
