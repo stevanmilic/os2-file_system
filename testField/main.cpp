@@ -35,7 +35,7 @@ public:
 	}
 
 	void print(){
-		cout << dir[0].name;
+		cout << dir[0].name << endl;
 	}
 };
 
@@ -47,8 +47,8 @@ int main(void){
 	Directory* myDir = a.getDir();
 	for(EntryNum i = 0; i < ENTRYCNT; i++)
 		if(myDir[i]->name[0] == '\0'){
-			strcpy(myDir[i]->name,"stevan" );
-			strcpy(myDir[i]->ext,"dat" );
+			strcpy(myDir[i]->name,"stevan\0" );
+			strcpy(myDir[i]->ext,"dat\0" );
 			myDir[i]->indexCluster = 0;
 			myDir[i]->size = 0;
 			break;
