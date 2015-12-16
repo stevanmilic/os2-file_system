@@ -2,6 +2,7 @@
 #ifndef _fcb_h_
 #define _fcb_h_
 //#include "rw.h"
+#include <cstring>
 
 typedef unsigned long EntryNum;
 
@@ -87,7 +88,14 @@ public:
 		return id.part;
 	}
 
-	static char* parseName(char *fpath);//get name of the file from absolute path
-	static char* parseExt(char *fpath);//get ext of the file from absolute path
+	static void parseName(char *fpath, char *name){
+		char p_len = 3;
+		char *pch = strchr(fpath,'.');
+		strncpy(name,fpath + p_len,pch - fpath - p_len);
+	}
+	static void parseExt(char *fpath,char *ext){
+		char *pch = strchr(fpath,'.');
+		strncpy(ext,fpath + (pch -fpath + 1),3);
+	}
 };
 #endif

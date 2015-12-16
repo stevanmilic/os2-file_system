@@ -20,7 +20,9 @@ char FS::readRootDir(char part, EntryNum n,Directory &d){
 }
 
 char FS::doesExist(char* fname){
-	return myImpl->kexist(fname);
+	if(myImpl->kexist(fname) < 64)
+		return 1;
+	return 0;
 }
 
 File* FS::open(char* fname, char mode){

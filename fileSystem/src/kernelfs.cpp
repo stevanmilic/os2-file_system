@@ -42,9 +42,10 @@ EntryNum KernelFS::kexist(char* fname){
 	if(pw == 0)
 		return 65;//excep: partition doesn't exist
 	Directory *myDir = pw->rootDir();
-	fname = FCB::parseName(fname);	
+	char *name = new char[FNAMELEN];
+	FCB::parseName(fname,name);
 	for(EntryNum j = 0;j < ENTRYCNT; j++)
-		if(strcmp(myDir[j]->name,fname) == 0)
+		if(strcmp(myDir[j]->name,name) == 0)
 			return j;//file found with given index
 	return 64;//file not found
 }
@@ -107,8 +108,8 @@ File* KernelFS::startWriting(char* fpath){
 	
 	for(EntryNum i = 0; i < ENTRYCNT; i++)
 		if(myDir[i]->name[0] == '\0'){
-			strcpy(myDir[index = i]->name, FCB::parseName(fpath));
-			strcpy(myDir[index]->ext, FCB::parseExt(fpath));
+			FCB::parseName(fpath,myDir[index = i]->name);
+			FCB::parseName(fpath,myDir[index]->ext);
 			myDir[index]->indexCluster = pw->cluster();
 			myDir[index]->size = ClusterSize;
 			break;

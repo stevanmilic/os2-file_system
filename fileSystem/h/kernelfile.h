@@ -22,6 +22,7 @@ class KernelFile{
 
 		BytesCnt currByte = 0;//current byte position in file
 		BytesCnt currOffset = 0;
+		BytesCnt currSize = ClusterSize;
 
 		KernelFile();
 		
