@@ -37,13 +37,14 @@ public:
 
 	void clear();
 	Directory* rootDir();
-	void read(char*,EntryNum,ClusterNo);
-	ClusterNo write(char*,EntryNum);
+	void read(void*,BytesCnt,BytesCnt,EntryNum,ClusterNo);
+	ClusterNo write(void*,BytesCnt,BytesCnt, EntryNum,ClusterNo = 0);
 	ClusterNo cluster();
 	void fopen(EntryNum);
 	void fclose(EntryNum);
 	bool getFormat();
-	void setStartCluster(EntryNum,ClusterNo);
 	ClusterNo getStartCluster(EntryNum);
+	BytesCnt getFileSize(EntryNum);
+	void setFileSize(EntryNum,BytesCnt size);
 };
 #endif

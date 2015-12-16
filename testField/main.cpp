@@ -17,7 +17,7 @@ struct Entry {
 	unsigned long size;
 };
 
-typedef Entry Directory[ENTRYCNT];
+typedef Entry Directory[2*ENTRYCNT];
 
 class A{
 	Directory dir;
@@ -26,11 +26,11 @@ public:
 		return &dir;
 	}
 
-	void setDir(char *buffer){
+	void setDir(void *buffer){
 		memcpy(dir,buffer,ClusterSize);
 	}
 
-	void setbuffer(char *buffer){
+	void setbuffer(void *buffer){
 		memcpy(buffer,dir,ClusterSize);
 	}
 
@@ -42,13 +42,14 @@ public:
 int main(void){
 	A a;
 	char *buffer = new char[ClusterSize];
+	cout << sizeof(char)*ClusterSize << endl;
 	memset(buffer,0,ClusterSize);
 	a.setDir(buffer);	
 	Directory* myDir = a.getDir();
 	for(EntryNum i = 0; i < ENTRYCNT; i++)
 		if(myDir[i]->name[0] == '\0'){
-			strcpy(myDir[i]->name,"stevan\0" );
-			strcpy(myDir[i]->ext,"dat\0" );
+			strcpy(myDir[i]->name,"stevan" );
+			strcpy(myDir[i]->ext,"dat" );
 			myDir[i]->indexCluster = 0;
 			myDir[i]->size = 0;
 			break;

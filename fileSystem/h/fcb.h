@@ -5,10 +5,14 @@
 
 typedef unsigned long EntryNum;
 
-struct FCBid{
+class FCB;
+
+class FCBid{
+	friend class FCB;
 	EntryNum entry;
 	char part;
 	char mode;
+public:
 
 	FCBid(){
 		entry = 0;
@@ -21,9 +25,16 @@ struct FCBid{
 		this->mode = mode;
 	}
 
+	char getMode(){
+		return mode;
+	}
+
 	operator int() const{
 		return (entry + part)*(entry + part + 1)/2 + part;
 	}
+
+	friend bool operator==(const FCBid& lhs, const FCBid& rhs);
+	friend bool operator!=(const FCBid& lhs, const FCBid& rhs);
 };
 
 bool operator==(const FCBid& lhs, const FCBid& rhs){

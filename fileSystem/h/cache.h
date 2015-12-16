@@ -31,8 +31,9 @@ public:
 		return bitVector;
 	}
 
-	bool readBlock(char*,EntryNum,ClusterNo);
-	bool writeBlock(char*,EntryNum,ClusterNo);
+	char* getBlock(LRU*,ClusterNo,char,EntryNum=0);
+	char* cacheBlock(EntryNum,ClusterNo,char);
+	char* partBlock(ClusterNo,char);
 	void readWriteBitVector();
 	void readWriteDir(char);
 	void clearBitVector();

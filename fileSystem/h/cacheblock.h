@@ -43,12 +43,12 @@ public:
 
 	//write copy and move constructor
 
-	void setData(char* buffer){
-		std::memcpy(data,buffer,ClusterSize);
+	void setData(void* buffer,unsigned long size){
+		std::memcpy(data,buffer,size);
 	}
 
-	void readData(char* buffer){
-		std::memcpy(buffer, data, ClusterSize);
+	void readData(void* buffer,unsigned long size){
+		std::memcpy(buffer, data, size);
 	}
 
 	char* getData(){

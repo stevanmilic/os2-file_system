@@ -19,14 +19,15 @@ Directory* PartWrapper::rootDir(){
 	return cache->getDir();
 }
 
-void PartWrapper::read(char* buffer, EntryNum entry, ClusterNo readCluster){
-	cache->readBlock(buffer,entry,readCluster);	
+void PartWrapper::read(void *buffer,BytesCnt buffSize,BytesCnt offset, EntryNum entry, ClusterNo readCluster){
+	std::memcpy(buffer,cache->cacheBlock(entry,readCluster,0) + offset,buffSize);
 }
 
-ClusterNo PartWrapper::write(char* buffer,EntryNum entry){
-	ClusterNo writtenCluster = cache->findFreeBlock();
-	cache->writeBlock(buffer,entry,writtenCluster);
-	return writtenCluster;
+ClusterNo PartWrapper::write(void* buffer,BytesCnt buffSize,BytesCnt offset, EntryNum entry,ClusterNo writeCluster){
+	if(writeCluster == 0)
+		writeCluster = cache->findFreeBlock();
+	std::memcpy(cache->cacheBlock(entry,writeCluster,1) + offset,buffer,buffSize);
+	return writeCluster;
 }
 
 ClusterNo PartWrapper::cluster(){
@@ -45,12 +46,17 @@ bool PartWrapper::getFormat(){
 	return format;
 }
 
-void PartWrapper::setStartCluster(EntryNum entry, ClusterNo startIndex){
-	Directory *dir = rootDir();
-	dir[entry]->indexCluster = startIndex;
-}
-
 ClusterNo PartWrapper::getStartCluster(EntryNum entry){
 	Directory *dir = rootDir();
 	return dir[entry]->indexCluster;
+}
+
+BytesCnt PartWrapper::getFileSize(EntryNum entry){
+	Directory *dir = rootDir();
+	return dir[entry]->size;
+}
+
+void PartWrapper::setFileSize(EntryNum entry,BytesCnt size){
+	Directory *dir = rootDir();
+	dir[entry]->size = size;
 }

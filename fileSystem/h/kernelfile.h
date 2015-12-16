@@ -21,8 +21,7 @@ class KernelFile{
 		ClusterNo secondLevelIndex = numOfDataIndexF;//current second level index
 
 		BytesCnt currByte = 0;//current byte position in file
-		ClusterNo currentCluster;//current Cluster ... indexCluster,dataCluster and
-		//secondLevelIndex specify what kind of cluster it's about
+		BytesCnt currOffset = 0;
 
 		KernelFile();
 		
