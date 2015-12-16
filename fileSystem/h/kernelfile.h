@@ -1,16 +1,28 @@
 //File : kernelfile.h
 #ifndef _kernelfile_h_
 #define _kernelfile_h_
+#include "fcb.h"
+#include "partwrapper.h"
 #include "kernelfs.h"
 
-typedef unsigned long FCB_ID;
+const	ClusterNo numOfIndex = ClusterSize/sizeof(ClusterNo);
+const	ClusterNo numOfDataIndexF = numOfIndex/2;
+const char firstLevel = 0;
+const char secondLevel = 1;
 
 class KernelFile{
 	private:
 		friend class File;
-		friend class KernelFS;
 
-		FCB_ID id;
+		FCBid id;
+
+		char indexCluster = firstLevel;//first level or second level index cl.
+		ClusterNo dataCluster = 0;//specific data cluster on first or second level
+		ClusterNo secondLevelIndex = numOfDataIndexF;//current second level index
+
+		BytesCnt currByte = 0;//current byte position in file
+		ClusterNo currentCluster;//current Cluster ... indexCluster,dataCluster and
+		//secondLevelIndex specify what kind of cluster it's about
 
 		KernelFile();
 		
@@ -21,8 +33,8 @@ class KernelFile{
 		char eof();
 		BytesCnt getFileSize();
 		char truncate();
-		void addFCB_ID(FCB_ID);
 	public:
+		void addFCBid(FCBid);
 		~KernelFile();
 };
 #endif

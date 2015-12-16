@@ -4,9 +4,8 @@
 #include "cache.h"
 
 KernelFS* KernelFS::onlySample = nullptr;
-
-KernelFS::KernelFS() : pt(ALPHASIZE), ft(ENTRYCNT){
-}
+HashTable<PartWrapper*,char> KernelFS::pt = HashTable<PartWrapper*,char>(ALPHASIZE);
+HashTable<FCB*,FCBid> KernelFS::ft = HashTable<FCB*,FCBid>(ENTRYCNT);
 
 KernelFS* KernelFS::sample(){
 	if(onlySample == nullptr) 
@@ -66,11 +65,16 @@ char KernelFS::kreadRootDir(char part, EntryNum entryNum,Directory &dir){
 }
 
 File* KernelFS::newFileOpened(PartWrapper* pw, char* fpath, char index, char mode){
-	FCB* newFCB = new FCB(PartWrapper::parseName(fpath), index, mode);
+  FCBid id(index,PartWrapper::parseName(fpath),mode);
+	FCB* fcb = ft.findKey(id);
+	if(fcb == 0){
+		FCB* newFCB = new FCB(id);
+		ft.insertKey(id, fcb);
+		pw->fopen(fcb->getEntry());
+	}
+	fcb->startMode(mode);
 	File* file = new File();
-	file->myImpl->addFCB_ID(newFCB->getID());
-	ft.insertKey(newFCB->getID(), newFCB);
-	pw->fopen(newFCB->getID());
+	file->myImpl->addFCBid(id);
 	return file;
 }
 
@@ -81,10 +85,6 @@ File* KernelFS::startReading(char *fpath,char mode){
 	PartWrapper* pw = pt.findKey(PartWrapper::parseName(fpath));
 	if(pw->getFormat())
 		return nullptr;
-	if(mode == 'r')
-		pw->startReading(index);
-	else
-		pw->startWriting(index);
 	return newFileOpened(pw, fpath, index, mode);
 }
 
@@ -117,7 +117,6 @@ File* KernelFS::startWriting(char* fpath){
 	if(index == 64)
 		return nullptr; //excep: directory full
 
-	pw->startWriting(index);
 	return newFileOpened(pw, fpath, index, 'w');
 }
 

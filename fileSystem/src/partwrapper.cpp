@@ -1,13 +1,17 @@
 //Fiel: partwrapper.cpp
 #include "partwrapper.h"
 
+PartWrapper::PartWrapper(Partition* part){
+	this->part = part;
+	cache = new Cache(part);
+}
+
+
 void PartWrapper::clear(){
 	format = 1;
-	EnterCriticalSection(&csPart);
 	cache->clearBitVector();
 	cache->clearDir();
 	//TO DO :cache->clearCacheBlocks();
-	LeaveCriticalSection(&csPart);
 	format = 0;
 }
 
@@ -15,13 +19,13 @@ Directory* PartWrapper::rootDir(){
 	return cache->getDir();
 }
 
-void PartWrapper::raed(char* buffer, ID fcbID, ClusterNo readCluster){
-	cache->readBlock(buffer,fcbID,readCluster);	
+void PartWrapper::read(char* buffer, EntryNum entry, ClusterNo readCluster){
+	cache->readBlock(buffer,entry,readCluster);	
 }
 
-ClusterNo PartWrapper::write(char* buffer,ID fcbID){
+ClusterNo PartWrapper::write(char* buffer,EntryNum entry){
 	ClusterNo writtenCluster = cache->findFreeBlock();
-	cache->writeBlock(buffer,fcbID,writtenCluster);
+	cache->writeBlock(buffer,entry,writtenCluster);
 	return writtenCluster;
 }
 
@@ -29,48 +33,24 @@ ClusterNo PartWrapper::cluster(){
 	return cache->findFreeBlock();
 }
 
-void PartWrapper::fopen(ID fcbID){
-	cache->newFileCache(fcbID);
-	if(rwt.fillRatio() > 0.0)
-		EnterCriticalSection(&csPart);
-		;
+void PartWrapper::fopen(EntryNum entry){
+	cache->newFileCache(entry);
 }
 
-void PartWrapper::fclose(ID fcbID){
-	cache->closeFileCache(fcbID);
-	if(rwt.fillRatio() == 0.0)
-		LeaveCriticalSection(&csPart);
-		;
+void PartWrapper::fclose(EntryNum entry){
+	cache->closeFileCache(entry);
 }
 
 bool PartWrapper::getFormat(){
 	return format;
 }
 
-void PartWrapper::startReading(EntryNum entry){
-	ReadersWriters* rw = rwt.findKey(entry);
-	if(rw == 0){
-		rw = new ReadersWriters();
-		rwt.insertKey(entry,rw);
-	}
-	rw->startRead();
+void PartWrapper::setStartCluster(EntryNum entry, ClusterNo startIndex){
+	Directory *dir = rootDir();
+	dir[entry]->indexCluster = startIndex;
 }
 
-void PartWrapper::stopReading(EntryNum entry){
-	ReadersWriters* rw = rwt.findKey(entry);
-	rw->stopRead();
-}
-
-void PartWrapper::startWriting(EntryNum entry){
-	ReadersWriters* rw = rwt.findKey(entry);
-	if(rw == 0){
-		rw = new ReadersWriters();
-		rwt.insertKey(entry,rw);
-	}
-	rw->startWrite();
-}
-
-void PartWrapper::stopWriting(EntryNum entry){
-	ReadersWriters* rw = rwt.findKey(entry);
-	rw->stopWrite();
+ClusterNo PartWrapper::getStartCluster(EntryNum entry){
+	Directory *dir = rootDir();
+	return dir[entry]->indexCluster;
 }

@@ -5,6 +5,7 @@
 #include "file.h"
 #include "partwrapper.h"
 #include "fcb.h"
+#include "kernelfile.h"
 
 const char ALPHASIZE = 26;
 
@@ -13,9 +14,10 @@ class KernelFS{
 		KernelFS();
 	private:
 		friend class FS;
+		friend class KernelFile;
 
-		HashTable<PartWrapper*,char> pt;
-		HashTable<FCB*,unsigned long> ft;
+		static HashTable<PartWrapper*,char> pt;
+		static HashTable<FCB*,FCBid> ft;
 
 		static KernelFS* onlySample;
 		static KernelFS* sample();

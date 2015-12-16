@@ -30,7 +30,7 @@ template <class T,class K> class HashTable{
   void copy(const HashTable& ht);
   void move(HashTable& ht);
   void deleteTable();
-  int h(Key k);
+  int h(int k);
   
 public:
   HashTable(int n){
@@ -112,7 +112,7 @@ template <class T,class K> void HashTable<T,K>::deleteTable(){
   table = nullptr;
 } 
 
-template <class T,class K> int HashTable<T,K>::h(Key k){
+template <class T,class K> int HashTable<T,K>::h(int k){
   return k % n;
 } 
 

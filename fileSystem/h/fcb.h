@@ -1,27 +1,79 @@
-//File: fcb.h
+//Fbufferile: fcb.h
 #ifndef _fcb_h_
 #define _fcb_h_
-#include "fs.h"
+//#include "rw.h"
 
-typedef unsigned long ID;
+typedef unsigned long EntryNum;
 
-class FCB{
-	EntryNum entryNum;
+struct FCBid{
+	EntryNum entry;
 	char part;
-	char mode;//write,read,append
+	char mode;
 
-	static ID posID;//default 0
-	ID id = posID++;
+	FCBid(){
+		entry = 0;
+		part = -1;
+	}
 
-public:
-	FCB(char part, EntryNum entryNum, char mode){
+	FCBid(EntryNum entry,char part,char mode){
+		this->entry = entry;
 		this->part = part;
-		this->entryNum = entryNum;
 		this->mode = mode;
 	}
 
-	ID getID(){
+	operator int() const{
+		return (entry + part)*(entry + part + 1)/2 + part;
+	}
+};
+
+bool operator==(const FCBid& lhs, const FCBid& rhs){
+	return lhs.part == rhs.part && lhs.entry == rhs.entry;
+}
+ 
+bool operator!=(const FCBid& lhs, const FCBid& rhs){
+	return !(lhs == rhs);
+}
+
+class FCB{
+	FCBid id;
+	//ReadersWriters rw;
+	unsigned long filesOp = 0;
+
+public:
+	FCB(FCBid id){
+		this->id = id;
+	}
+
+	void startMode(char mode){
+		/*if(mode == 'r')
+			rw.startRead();
+		else
+			rw.startWrite();*/
+		filesOp++;
+	}
+
+	void closeMode(char mode){
+		/*if(mode == 'r')
+			rw.stopRead();
+		else
+			rw.stopWrite();*/
+		filesOp--;
+	}
+
+	unsigned long getFilesOpened(){
+		return filesOp;
+	}
+
+	FCBid getID(){
 		return id;
+	}
+
+	EntryNum getEntry(){
+		return id.entry;
+	}
+
+	char getPart(){
+		return id.part;
 	}
 
 	static char* parseName(char *fpath);//get name of the file from absolute path

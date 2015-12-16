@@ -3,33 +3,19 @@
 #define _partwrapper_h_
 #include "part.h"
 #include "cache.h"
-#include "rw.h"
-//TO DO:
-//use cache wisely :)
 
 class PartWrapper{
 	Cache* cache;
 	Partition *part;
-	HashTable<ReadersWriters*,EntryNum> rwt;
-	CRITICAL_SECTION csPart;
 	
 	static char posID;//default 0
 	char id = posID++;
 	char name = 'A' + id;
 	char format = 0;
 public:
-	PartWrapper(Partition* part) : rwt(64){
-		this->part = part;
-		cache = new Cache(part);
-		InitializeCriticalSection(&csPart);
-	}
+	PartWrapper(Partition*);
+	~PartWrapper();	
 
-	~PartWrapper(){
-		EnterCriticalSection(&csPart);
-		LeaveCriticalSection(&csPart);
-		DeleteCriticalSection(&csPart);
-	}
-	
 	char getID(){
 		return id;
 	}
@@ -51,15 +37,13 @@ public:
 
 	void clear();
 	Directory* rootDir();
-	void raed(char*,ID,ClusterNo);
-	ClusterNo write(char*,ID);
+	void read(char*,EntryNum,ClusterNo);
+	ClusterNo write(char*,EntryNum);
 	ClusterNo cluster();
-	void fopen(ID fcbID);
-	void fclose(ID fcbID);
+	void fopen(EntryNum);
+	void fclose(EntryNum);
 	bool getFormat();
-	void startReading(EntryNum);
-	void stopReading(EntryNum);
-	void startWriting(EntryNum);
-	void stopWriting(EntryNum);
+	void setStartCluster(EntryNum,ClusterNo);
+	ClusterNo getStartCluster(EntryNum);
 };
 #endif

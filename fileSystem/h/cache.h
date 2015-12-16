@@ -6,7 +6,6 @@
 #include "lru.h"
 #include "fs.h"
 
-typedef unsigned long ID;
 class Cache{
 //TO DO: implementation:
 //Writing and Reading could be done(delayed) in sepate thread
@@ -15,7 +14,7 @@ class Cache{
 	Partition *part;
 	CacheBlock** cbs;
 	LRU* partLRU;
-	HashTable<LRU*,ID> lt;
+	HashTable<LRU*,EntryNum> lt;
 	Directory dir;
 	char* bitVector;
 
@@ -32,14 +31,14 @@ public:
 		return bitVector;
 	}
 
-	bool readBlock(char*,ID,ClusterNo);
-	bool writeBlock(char*,ID,ClusterNo);
+	bool readBlock(char*,EntryNum,ClusterNo);
+	bool writeBlock(char*,EntryNum,ClusterNo);
 	void readWriteBitVector();
 	void readWriteDir(char);
 	void clearBitVector();
 	void clearDir();
-	void newFileCache(ID);
-	void closeFileCache(ID);
+	void newFileCache(EntryNum);
+	void closeFileCache(EntryNum);
 	ClusterNo findFreeBlock();
 };
 #endif

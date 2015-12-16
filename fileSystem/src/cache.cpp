@@ -1,7 +1,7 @@
 //File: cache.cpp
 #include "cache.h"
 
-Cache::Cache(Partition* part) : lt(64){
+Cache::Cache(Partition* part) : lt(ENTRYCNT){
 	this->part = part;
 	cbs = new CacheBlock*[part->getNumOfClusters()];
 	partLRU = new LRU(cbs,part);
@@ -20,9 +20,11 @@ Cache::~Cache(){
 	return partSize/bvSize + partSize % bvSize == partSize ? 0 : 1;
 }*/
 
-void Cache::newFileCache(ID fcbid){
-	LRU* lru = new LRU(cbs,part);
-	lt.insertKey(fcbid,lru);
+void Cache::newFileCache(EntryNum entry){
+	LRU *lru = lt.findKey(entry);
+	if(lru == 0)
+		lru = new LRU(cbs,part);
+	lt.insertKey(entry,lru);
 }
 
 ClusterNo Cache::findFreeBlock(){
@@ -36,8 +38,8 @@ ClusterNo Cache::findFreeBlock(){
 	return blockNo;
 }
 
-bool Cache::writeBlock(char* buffer, ID fcbID, ClusterNo blockNo){
-	LRU* lru = lt.findKey(fcbID);
+bool Cache::writeBlock(char* buffer, EntryNum entry, ClusterNo blockNo){
+	LRU* lru = lt.findKey(entry);
 	if(lru == 0)
 		return 0;//file not found?
 
@@ -52,8 +54,8 @@ bool Cache::writeBlock(char* buffer, ID fcbID, ClusterNo blockNo){
 	return 1;
 }
 
-bool Cache::readBlock(char* buffer, ID fcbID, ClusterNo blockNo){
-	LRU *lru = lt.findKey(fcbID);
+bool Cache::readBlock(char* buffer, EntryNum entry, ClusterNo blockNo){
+	LRU *lru = lt.findKey(entry);
 	if(lru == 0)
 		return 0;//file not found?
 
@@ -100,6 +102,6 @@ void Cache::readWriteDir(char write){
 		memcpy(block->getData(),dir,ClusterSize);
 }
 
-void Cache::closeFileCache(ID fcbID){
-	lt.deleteKey(fcbID);
+void Cache::closeFileCache(EntryNum entry){
+	lt.deleteKey(entry);
 }
