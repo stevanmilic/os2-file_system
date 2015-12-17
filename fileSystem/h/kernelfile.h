@@ -1,8 +1,8 @@
 //File : kernelfile.h
 #ifndef _kernelfile_h_
 #define _kernelfile_h_
-#include "fcb.h"
 #include "partwrapper.h"
+#include "fcb.h"
 #include "kernelfs.h"
 
 const	ClusterNo numOfIndex = ClusterSize/sizeof(ClusterNo);
@@ -24,7 +24,7 @@ class KernelFile{
 		BytesCnt currOffset = 0;
 		BytesCnt currSize = ClusterSize;
 
-		KernelFile();
+//		KernelFile();
 		
 		char kwrite(BytesCnt,char*);
 		BytesCnt kread(BytesCnt,char*);

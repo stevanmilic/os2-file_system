@@ -1,7 +1,7 @@
-//Fbufferile: fcb.h
+//File: fcb.h
 #ifndef _fcb_h_
 #define _fcb_h_
-//#include "rw.h"
+#include "rw.h"
 #include <cstring>
 
 typedef unsigned long EntryNum;
@@ -30,25 +30,15 @@ public:
 		return mode;
 	}
 
-	operator int() const{
-		return (entry + part)*(entry + part + 1)/2 + part;
-	}
+	operator int() const;
 
 	friend bool operator==(const FCBid& lhs, const FCBid& rhs);
 	friend bool operator!=(const FCBid& lhs, const FCBid& rhs);
 };
 
-bool operator==(const FCBid& lhs, const FCBid& rhs){
-	return lhs.part == rhs.part && lhs.entry == rhs.entry;
-}
- 
-bool operator!=(const FCBid& lhs, const FCBid& rhs){
-	return !(lhs == rhs);
-}
-
 class FCB{
 	FCBid id;
-	//ReadersWriters rw;
+	ReadersWriters rw;
 	unsigned long filesOp = 0;
 
 public:
@@ -56,21 +46,9 @@ public:
 		this->id = id;
 	}
 
-	void startMode(char mode){
-		/*if(mode == 'r')
-			rw.startRead();
-		else
-			rw.startWrite();*/
-		filesOp++;
-	}
+	void startMode(char mode);
 
-	void closeMode(char mode){
-		/*if(mode == 'r')
-			rw.stopRead();
-		else
-			rw.stopWrite();*/
-		filesOp--;
-	}
+	void closeMode(char mode);
 
 	unsigned long getFilesOpened(){
 		return filesOp;
@@ -88,14 +66,7 @@ public:
 		return id.part;
 	}
 
-	static void parseName(char *fpath, char *name){
-		char p_len = 3;
-		char *pch = strchr(fpath,'.');
-		strncpy(name,fpath + p_len,pch - fpath - p_len);
-	}
-	static void parseExt(char *fpath,char *ext){
-		char *pch = strchr(fpath,'.');
-		strncpy(ext,fpath + (pch -fpath + 1),3);
-	}
+	static void parseName(char *fpath, char *name);
+	static void parseExt(char *fpath,char *ext);
 };
 #endif

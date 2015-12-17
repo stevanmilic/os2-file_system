@@ -7,11 +7,11 @@ Cache::Cache(Partition* part) : lt(ENTRYCNT){
 	partLRU = new LRU(cbs,part);
 	bitVector = partBlock(0,1);//read blockNo = 1, and make it dirty
 	memcpy(dir,partBlock(1,0),sizeof dir);
-	readWriteDir(0);//read dir from part
 }
 
 Cache::~Cache(){
 	memcpy(dir,partBlock(1,1),sizeof dir);
+	delete [] cbs;
 	delete partLRU;
 	//hashtable deletes all file cache lru's, and writes cache blocks to part
 }

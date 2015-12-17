@@ -34,8 +34,6 @@ public:
 	char* getBlock(LRU*,ClusterNo,char,EntryNum=0);
 	char* cacheBlock(EntryNum,ClusterNo,char);
 	char* partBlock(ClusterNo,char);
-	void readWriteBitVector();
-	void readWriteDir(char);
 	void clearBitVector();
 	void clearDir();
 	void newFileCache(EntryNum);

@@ -1,7 +1,15 @@
 #include "kernelfile.h"
 
 //---------------------- UGLHHY -----------------------------------
-//TO DO : make a class for index operations!!!!
+//TO DO : make a class for index allocation!!!!
+void KernelFile::addFCBid(FCBid id){
+	this->id = id;
+}
+
+KernelFile::~KernelFile(){
+	FCB *fcb = KernelFS::ft.findKey(id);
+	fcb->closeMode(id.getMode());
+}
 
 char KernelFile::kwrite(BytesCnt len, char *writeBuffer){
 	//get right fcb and pw
@@ -26,11 +34,11 @@ char KernelFile::kwrite(BytesCnt len, char *writeBuffer){
 			currByte = getFileSize();
 	}
 
+	char smallFileFile = 0;
 	BytesCnt currWrite = 0;
-	char small = 0;
 	if(len < currSize){
 		currSize = len;
-		small = 1;
+		smallFileFile = 1;
 	}
 
 	while(currWrite < len){
@@ -61,7 +69,7 @@ char KernelFile::kwrite(BytesCnt len, char *writeBuffer){
 		}
 	}
 
-	if(small)
+	if(smallFileFile)
 		currOffset += currSize;
 	else
 		currOffset = currSize;
@@ -97,10 +105,10 @@ BytesCnt KernelFile::kread(BytesCnt len, char *readBuffer){
 		return 0;
 
 	BytesCnt currRead = 0;
-	char small = 0;
+	char smallFile = 0;
 	if(len < currSize){
 		currSize = len;
-		small = 1;
+		smallFile = 1;
 	}
 
 	while(currRead < len){
@@ -129,7 +137,7 @@ BytesCnt KernelFile::kread(BytesCnt len, char *readBuffer){
 		}
 	}
 
-	if(small)
+	if(smallFile)
 		currOffset += currSize;
 	else
 		currOffset = currSize;
@@ -204,4 +212,9 @@ BytesCnt KernelFile::getFileSize(){
 	FCB *fcb = KernelFS::ft.findKey(id);
 	PartWrapper* pw = KernelFS::pt.findKey(PartWrapper::toNumber(fcb->getPart()));
 	return pw->getFileSize(fcb->getEntry());
+}
+
+char KernelFile::truncate(){
+	//TO DO: implement this :)
+	return 1;
 }

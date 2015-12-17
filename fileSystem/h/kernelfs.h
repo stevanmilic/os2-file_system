@@ -4,14 +4,13 @@
 #include "fs.h"
 #include "file.h"
 #include "partwrapper.h"
-#include "fcb.h"
 #include "kernelfile.h"
 
 const char ALPHASIZE = 26;
 
 class KernelFS{
 	protected:
-		KernelFS();
+//		KernelFS();
 	private:
 		friend class FS;
 		friend class KernelFile;

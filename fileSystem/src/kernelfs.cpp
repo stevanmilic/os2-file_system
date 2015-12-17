@@ -136,3 +136,9 @@ File* KernelFS::kopen(char* fpath, char mode){
 			return nullptr;
 	}
 }
+
+char KernelFS::kdelete(char* fpath){
+	//TO DO: implement this 
+	//dummy
+	return 0;
+}

@@ -1,12 +1,16 @@
 //Fiel: partwrapper.cpp
 #include "partwrapper.h"
 
+char PartWrapper::posID = 0;
+
 PartWrapper::PartWrapper(Partition* part){
 	this->part = part;
 	cache = new Cache(part);
 }
 
-
+PartWrapper::~PartWrapper(){
+	delete cache;
+}
 void PartWrapper::clear(){
 	format = 1;
 	cache->clearBitVector();
