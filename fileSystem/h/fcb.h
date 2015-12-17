@@ -1,7 +1,7 @@
 //File: fcb.h
 #ifndef _fcb_h_
 #define _fcb_h_
-#include "rw.h"
+//#include "rw.h"
 #include <cstring>
 
 typedef unsigned long EntryNum;
@@ -38,7 +38,7 @@ public:
 
 class FCB{
 	FCBid id;
-	ReadersWriters rw;
+	//ReadersWriters rw;
 	unsigned long filesOp = 0;
 
 public:
@@ -50,7 +50,7 @@ public:
 
 	void closeMode(char mode);
 
-	unsigned long getFilesOpened(){
+	unsigned long fileOpened(){
 		return filesOp;
 	}
 

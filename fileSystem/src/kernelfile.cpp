@@ -1,17 +1,85 @@
 #include "kernelfile.h"
+#include "iterator.h"
 
 //---------------------- UGLHHY -----------------------------------
 //TO DO : make a class for index allocation!!!!
-void KernelFile::addFCBid(FCBid id){
-	this->id = id;
+
+KernelFile::KernelFile(){
+	FCB *fcb = KernelFS::ft.findKey(id);
+	PartWrapper* pw = KernelFS::pt.findKey(PartWrapper::toNumber(fcb->getPart()));
+	index = new IndexAlloc(pw,fcb->getEntry());
 }
 
 KernelFile::~KernelFile(){
 	FCB *fcb = KernelFS::ft.findKey(id);
 	fcb->closeMode(id.getMode());
+	if(fcb->fileOpened()){
+		PartWrapper* pw = KernelFS::pt.findKey(PartWrapper::toNumber(fcb->getPart()));
+		pw->fclose(fcb->getEntry());
+	}
+}
+
+void KernelFile::addFCBid(FCBid id){
+	this->id = id;
 }
 
 char KernelFile::kwrite(BytesCnt len, char *writeBuffer){
+	if(id.getMode() == 'r')
+		return 0;
+
+	//if file already has data written
+	if(getFileSize())
+		index->loadIndex();
+
+	index->load(len,writeBuffer);
+
+	Iterator* iter = index->createIterator('w');
+	for(iter->onFirst();!iter->done();iter->next())
+		currByte += iter->curr();
+
+	if(currByte > getFileSize())
+		pw->setFileSize(fcb->getEntry(),currByte);
+	else
+		currByte = getFileSize();
+	
+	return 1;
+}
+
+BytesCnt KernelFile::kread(BytesCnt len, char *readBuffer){
+	if(id.getMode() == 'w')
+		return 0;
+	
+	if(getFileSize()){
+		index->loadIndex();
+		if(currByte + len > getFileSize())
+			len = getFileSize() - currByte;
+	}
+
+	index->load(len,readBuffer);
+
+	Iterator* iter = index->createIterator('r');
+	for(iter->onFirst();!iter->done();iter->next())
+		currByte += iter->curr();
+	return iter->curr();
+}
+
+
+char KernelFile::seek(BytesCnt len){
+	if(getFileSize()){
+		index->loadIndex();
+		if(currByte + len > getFileSize())
+			len = getFileSize() - currByte;
+	}
+
+	index->load(len);
+
+	Iterator* iter = index->createIterator('s');
+	for(iter->onFirst();!iter->done();iter->next())
+		currByte += iter->curr();
+	return 1;
+}
+
+/*char KernelFile::kwrite(BytesCnt len, char *writeBuffer){
 	//get right fcb and pw
 	FCB *fcb = KernelFS::ft.findKey(id);
 	if(id.getMode() == 'r')
@@ -196,7 +264,7 @@ char KernelFile::seek(BytesCnt len){
 		delete index[i];
 	delete [] index;
 	return currRead;
-}
+}*/
 
 BytesCnt KernelFile::filePos(){
 	return currByte;
