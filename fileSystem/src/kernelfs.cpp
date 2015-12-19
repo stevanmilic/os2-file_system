@@ -41,11 +41,11 @@ EntryNum KernelFS::kexist(char* fname){
 	PartWrapper* pw = pt.findKey(PartWrapper::parseName(fname));
 	if(pw == 0)
 		return 65;//excep: partition doesn't exist
-	Directory *myDir = pw->rootDir();
+	Directory& myDir = pw->rootDir();
 	char *name = new char[FNAMELEN];
 	FCB::parseName(fname,name);
 	for(EntryNum j = 0;j < ENTRYCNT; j++)
-		if(strcmp(myDir[j]->name,name) == 0)
+		if(strcmp(myDir[j].name,name) == 0)
 			return j;//file found with given index
 	return 64;//file not found
 }
@@ -54,22 +54,22 @@ char KernelFS::kreadRootDir(char part, EntryNum entryNum,Directory &dir){
 	PartWrapper* pw = pt.findKey(PartWrapper::toNumber(part));
 	if(pw == 0)
 		return 0;//excep: partition doesn't exist
-	Directory *myDir = pw->rootDir();	
+	Directory& myDir = pw->rootDir();	
 
 	char counter = 0;
 	for(int i = entryNum; i < ENTRYCNT; i++)
-		if(myDir[i]->name[0] != '\0')
-			dir[counter++] = *myDir[i];
+		if(myDir[i].name[0] != '\0')
+			dir[counter++] = myDir[i];
 	if(counter < 64)
 		return 0;
 	return 1;
 }
 
-File* KernelFS::newFileOpened(PartWrapper* pw, char* fpath, char index, char mode){
-  FCBid id(index,PartWrapper::parseName(fpath),mode);
+File* KernelFS::newFileOpened(PartWrapper* pw, char* fpath, EntryNum index, char mode){
+	FCBid id(index,PartWrapper::parseName(fpath),mode);
 	FCB* fcb = ft.findKey(id);
 	if(fcb == 0){
-		FCB* newFCB = new FCB(id);
+		fcb= new FCB(id);
 		ft.insertKey(id, fcb);
 		pw->fopen(fcb->getEntry());
 	}
@@ -103,15 +103,15 @@ File* KernelFS::startWriting(char* fpath){
 	if(pw->getFormat())
 		return nullptr;
 
-	Directory *myDir = pw->rootDir();	
+	Directory& myDir = pw->rootDir();	
 
 	
 	for(EntryNum i = 0; i < ENTRYCNT; i++)
-		if(myDir[i]->name[0] == '\0'){
-			FCB::parseName(fpath,myDir[index = i]->name);
-			FCB::parseName(fpath,myDir[index]->ext);
-			myDir[index]->indexCluster = pw->cluster();
-			myDir[index]->size = ClusterSize;
+		if(myDir[i].name[0] == '\0'){
+			FCB::parseName(fpath,myDir[index = i].name);
+			FCB::parseExt(fpath,myDir[index].ext);
+			myDir[index].indexCluster = pw->cluster();
+			myDir[index].size = 0;//ClusterSize
 			break;
 		}
 

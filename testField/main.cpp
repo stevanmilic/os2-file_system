@@ -17,21 +17,21 @@ struct Entry {
 	unsigned long size;
 };
 
-typedef Entry Directory[2*ENTRYCNT];
+typedef Entry Directory[ENTRYCNT];
 
 class A{
 	Directory dir;
 public:
-	Directory* getDir(){
-		return &dir;
+	Directory& getDir(){
+		return dir;
 	}
 
-	void setDir(void *buffer){
-		memcpy(dir,buffer,ClusterSize);
+	void setDir(char *buffer){
+		memcpy(dir,buffer,sizeof dir);
 	}
 
-	void setbuffer(void *buffer){
-		memcpy(buffer,dir,ClusterSize);
+	void setbuffer(char *buffer){
+		memcpy(buffer,dir,sizeof dir);
 	}
 
 	void print(){
@@ -54,19 +54,24 @@ void parseExt(char *fpath,char*ext){
 int main(void){
 	A a;
 	char *buffer = new char[ClusterSize];
-	cout << sizeof(char)*ClusterSize << endl;
 	memset(buffer,0,ClusterSize);
 	a.setDir(buffer);	
 	char filepath[]="1:\\fajl1.dat";
-	Directory* myDir = a.getDir();
+	Directory& myDir = a.getDir();
 	for(EntryNum i = 0; i < ENTRYCNT; i++)
-		if(myDir[i]->name[0] == '\0'){
-			parseName(filepath,myDir[i]->name);
-			parseExt(filepath,myDir[i]->ext);
-			myDir[i]->indexCluster = 0;
-			myDir[i]->size = 0;
+		if(myDir[i].name[0] == '\0'){
+			parseName(filepath,myDir[i].name);
+			parseExt(filepath,myDir[i].ext);
+			myDir[i].indexCluster = 0;
+			myDir[i].size = 0;
 			break;
 		}
+	char* name = new char[FNAMELEN];
+	parseName(filepath,name);
+	for(EntryNum j = 0;j < ENTRYCNT; j++)
+		if(myDir[j].name[0] != '\0' && strcmp(myDir[j].name,name) == 0)
+			cout << " WUHU " << endl;
+		
 	a.setbuffer(buffer);
 	//----------------------------
 	a.setDir(buffer);

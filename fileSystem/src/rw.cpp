@@ -14,11 +14,11 @@ ReadersWriters::~ReadersWriters(){
 }
 void ReadersWriters::startWrite(){
 	EnterCriticalSection(&csWriter);
+	WaitForSingleObject(readClear, INFINITE);
 }
 
 void ReadersWriters::stopWrite(){
 	LeaveCriticalSection(&csWriter);
-	WaitForSingleObject(readClear,INFINITE);
 }
 
 void ReadersWriters::startRead(){

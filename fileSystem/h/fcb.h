@@ -1,8 +1,8 @@
 //File: fcb.h
 #ifndef _fcb_h_
 #define _fcb_h_
-//#include "rw.h"
-#include <cstring>
+#include "rw.h"
+#include <string.h>
 
 typedef unsigned long EntryNum;
 
@@ -38,14 +38,18 @@ public:
 
 class FCB{
 	FCBid id;
-	//ReadersWriters rw;
+	ReadersWriters* rw;
 	unsigned long filesOp = 0;
 
 public:
 	FCB(FCBid id){
 		this->id = id;
+		rw = new ReadersWriters();
 	}
 
+	~FCB() {
+		delete rw;
+	}
 	void startMode(char mode);
 
 	void closeMode(char mode);

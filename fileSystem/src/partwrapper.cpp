@@ -6,20 +6,30 @@ char PartWrapper::posID = 0;
 PartWrapper::PartWrapper(Partition* part){
 	this->part = part;
 	cache = new Cache(part);
+	InitializeCriticalSection(&csPart);
 }
 
 PartWrapper::~PartWrapper(){
+	unmount = true;
+	EnterCriticalSection(&csPart);
 	delete cache;
+	LeaveCriticalSection(&csPart);
+
+	DeleteCriticalSection(&csPart);
 }
 void PartWrapper::clear(){
-	format = 1;
-	cache->clearBitVector();
-	cache->clearDir();
-	//TO DO :cache->clearCacheBlocks();
-	format = 0;
+	if (!unmount) {
+		format = true;
+		EnterCriticalSection(&csPart);
+		cache->clearBitVector();
+		cache->clearDir();
+		//TO DO :cache->clearCacheBlocks();
+		LeaveCriticalSection(&csPart);
+		format = false;
+	}
 }
 
-Directory* PartWrapper::rootDir(){
+Directory& PartWrapper::rootDir(){
 	return cache->getDir();
 }
 
@@ -40,10 +50,18 @@ ClusterNo PartWrapper::cluster(){
 
 void PartWrapper::fopen(EntryNum entry){
 	cache->newFileCache(entry);
+	if (!cacheUsed && cache->hasData()) {
+		cacheUsed = true;
+		EnterCriticalSection(&csPart);
+	}
 }
 
 void PartWrapper::fclose(EntryNum entry){
 	cache->closeFileCache(entry);
+	if (cacheUsed && !cache->hasData()) {
+		LeaveCriticalSection(&csPart);
+		cacheUsed = false;
+	}
 }
 
 bool PartWrapper::getFormat(){
@@ -51,16 +69,16 @@ bool PartWrapper::getFormat(){
 }
 
 ClusterNo PartWrapper::getStartCluster(EntryNum entry){
-	Directory *dir = rootDir();
-	return dir[entry]->indexCluster;
+	Directory& dir = rootDir();
+	return dir[entry].indexCluster;
 }
 
 BytesCnt PartWrapper::getFileSize(EntryNum entry){
-	Directory *dir = rootDir();
-	return dir[entry]->size;
+	Directory& dir = rootDir();
+	return dir[entry].size;
 }
 
 void PartWrapper::setFileSize(EntryNum entry,BytesCnt size){
-	Directory *dir = rootDir();
-	dir[entry]->size = size;
+	Directory& dir = rootDir();
+	dir[entry].size = size;
 }

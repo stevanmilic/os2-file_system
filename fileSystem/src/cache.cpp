@@ -3,10 +3,12 @@
 
 Cache::Cache(Partition* part) : lt(ENTRYCNT){
 	this->part = part;
-	cbs = new CacheBlock*[part->getNumOfClusters()];
+	cbs = new CacheBlock*[part->getNumOfClusters()]();
 	partLRU = new LRU(cbs,part);
 	bitVector = partBlock(0,1);//read blockNo = 1, and make it dirty
 	memcpy(dir,partBlock(1,0),sizeof dir);
+	bitVector[0] = 1;
+	bitVector[1] = 1;
 }
 
 Cache::~Cache(){
@@ -34,7 +36,6 @@ ClusterNo Cache::findFreeBlock(){
 		if(bitVector[i] == 0){
 			bitVector[i] = 1;//project specification says otherwise? :)
 			return i;
-			
 		}
 	return 0;
 }
@@ -63,13 +64,19 @@ char* Cache::getBlock(LRU *lru,ClusterNo blockNo, char write, EntryNum entry){
 }
 
 void Cache::clearBitVector(){
-	memset(bitVector,0,ClusterSize);
+	memset(bitVector + 2,0,ClusterSize -2);
 }
 
 void Cache::clearDir(){
-	memset(dir,0,ClusterSize);
+	memset(dir,0,sizeof dir);
 }
 
 void Cache::closeFileCache(EntryNum entry){
 	lt.deleteKey(entry);
+}
+
+bool Cache::hasData() {
+	if (lt.fillRatio() > 0.0)
+		return true;
+	return false;
 }

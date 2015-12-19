@@ -26,7 +26,7 @@ bool Iterator::done(){
 			index->setCurrOffset(index->getCurrSize() + index->getCurrOffset());
 		else
 			index->setCurrOffset(index->getCurrSize());
-		index->setCurrOffset(ClusterSize - index->getCurrOffset());
+		index->setCurrSize(ClusterSize - index->getCurrOffset());
 		return true;
 	}
 	return false;
@@ -38,7 +38,7 @@ void ReadIterator::next(){
 }
 
 void WriteIterator::next(){
-	index->readIndex(current);
+	index->writeIndex(current);
 	Iterator::next();
 }
 
@@ -49,7 +49,7 @@ bool WriteIterator::done(){
 			index->setCurrOffset(index->getCurrSize() + index->getCurrOffset());
 		else
 			index->setCurrOffset(index->getCurrSize());
-		index->setCurrOffset(ClusterSize - index->getCurrOffset());
+		index->setCurrSize(ClusterSize - index->getCurrOffset());
 		index->writeLast();
 		return true;
 	}

@@ -25,7 +25,7 @@ class CacheBlock{
 	}
 
 	void initData(ClusterNo blockNo){
-		data = new char[ClusterSize];
+		data = new char[ClusterSize]();
 		//TO DO:read in a new thread
 		part->readCluster(this->blockNo = blockNo,data);
 	}

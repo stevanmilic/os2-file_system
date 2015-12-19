@@ -29,7 +29,7 @@ class KernelFS{
 		File* kopen(char*,char);
 		char kdelete(char*); 
 
-		File* newFileOpened(PartWrapper*,char*,char,char);
+		File* newFileOpened(PartWrapper*,char*,EntryNum,char);
 		File* startReading(char*,char);
 		File* startWriting(char*);
 	public:

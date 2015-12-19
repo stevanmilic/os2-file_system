@@ -5,20 +5,26 @@
 enum State{Empty, Deleted, Full};
 
 template <class T,class K> class HashTable{
-	using Key = K;
+  using Key = K;
   struct Elem{
     Key k;
-    T dat;
+    T dat = nullptr;
     State a = Empty;
     Elem() {}
     Elem(Key k, T dat,State a){
       this->k = k;
       this->dat = dat;
       this->a = a;
-    } 
-		Elem(Elem* newElem){
-			Elem(newElem->k, newElem->dat, newElem->a);
-		}
+    }
+
+	Elem(Elem* newElem){
+	  Elem(newElem->k, newElem->dat, newElem->a);
+	}
+
+	~Elem() {
+	   if (dat != nullptr)
+	     delete dat;
+	}
   }; 
   Elem **table;
 	//Good choice for n is, n = 2^m, or n is a prime number
@@ -38,7 +44,7 @@ public:
     table = new Elem*[n];
     for(int i = 0;i < n;i++)
       table[i] = new Elem;
-		address = new QuadraticHashing(n);
+	address = new QuadraticHashing(n);
   } 
 
   ~HashTable(){
@@ -174,7 +180,8 @@ template <class T,class K> bool HashTable<T,K>::deleteKey(Key k){
     } 
     if(table[j]->k == k){
       table[j]->a = Deleted;
-			delete table[j]->dat;
+	  delete table[j]->dat;
+	  table[j] = nullptr;
       return 1;
     } 
     else{

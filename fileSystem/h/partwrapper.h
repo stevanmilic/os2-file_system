@@ -1,17 +1,22 @@
 //File: partwrapper.h
 #ifndef _partwrapper_h_
 #define _partwrapper_h_
+#include <windows.h>
 #include "part.h"
 #include "cache.h"
 
 class PartWrapper{
 	Cache* cache;
 	Partition *part;
+
+	CRITICAL_SECTION csPart;
 	
 	static char posID;//default 0
 	char id = posID++;
 	char name = 'A' + id;
-	char format = 0;
+	bool format = false;
+	bool unmount = false;
+	bool cacheUsed = false;
 public:
 	PartWrapper(Partition*);
 	~PartWrapper();	
@@ -36,7 +41,7 @@ public:
 	}
 
 	void clear();
-	Directory* rootDir();
+	Directory& rootDir();
 	void read(void*,BytesCnt,BytesCnt,EntryNum,ClusterNo);
 	ClusterNo write(void*,BytesCnt,BytesCnt, EntryNum,ClusterNo = 0);
 	ClusterNo cluster();

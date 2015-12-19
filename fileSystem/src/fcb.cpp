@@ -15,27 +15,27 @@ FCBid::operator int() const{
 
 void FCB::startMode(char mode){
 	if(mode == 'r')
-		rw.startRead();
+		rw->startRead();
 	else
-		rw.startWrite();
+		rw->startWrite();
 	filesOp++;
 }
 
 void FCB::closeMode(char mode){
 	if(mode == 'r')
-		rw.stopRead();
+		rw->stopRead();
 	else
-		rw.stopWrite();
+		rw->stopWrite();
 	filesOp--;
 }
 
 void FCB::parseName(char *fpath, char *name){
 	char p_len = 3;
 	char *pch = strchr(fpath,'.');
-	strncpy(name,fpath + p_len,pch - fpath - p_len);
+	strncpy_s(name,/*sizeof name*/8,fpath + p_len,pch - fpath - p_len);
 }
 
 void FCB::parseExt(char *fpath,char *ext){
-	char *pch = strchr(fpath,'.');
-	strncpy(ext,fpath + (pch -fpath + 1),3);
+	 char* pch = strchr(fpath,'.');
+	 strncpy_s(ext,/*sizeof ext*/4,fpath + (pch -fpath + 1),3);
 }

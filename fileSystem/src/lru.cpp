@@ -40,15 +40,19 @@ void LRU::loadPage(ClusterNo blockNo){
 		lastAccessed = cbs[blockNo];
 
 	cbs[blockNo]->next = firstAccessed;
-	firstAccessed->prev = cbs[blockNo];
-	firstAccessed = firstAccessed->prev;
+	if (firstAccessed == nullptr)
+		firstAccessed = cbs[blockNo];
+	else {
+		firstAccessed->prev = cbs[blockNo];
+		firstAccessed = firstAccessed->prev;
+	}
 	firstAccessed->prev = nullptr;
 	firstAccessed->dirty = 0;
 	firstAccessed->valid = 1;
 }
 
 CacheBlock* LRU::hitPage(ClusterNo blockNo, char write){
-	if(cbs[blockNo]->valid){
+	if(cbs[blockNo] != nullptr && cbs[blockNo]->valid){
 		if(write)
 			cbs[blockNo]->dirty = 1;
 		if(firstAccessed != cbs[blockNo]){

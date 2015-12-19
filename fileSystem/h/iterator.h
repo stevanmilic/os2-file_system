@@ -26,6 +26,7 @@ public:
 };
 
 class ReadIterator: public Iterator{
+public:
 	ReadIterator(IndexAlloc *index) : Iterator(index){}
 
 	ReadIterator* copy() const override{
@@ -48,7 +49,7 @@ public:
 };
 
 class SeekIterator : public Iterator{
-
+public:
 	SeekIterator(IndexAlloc *index) : Iterator(index){}
 	SeekIterator* copy() const override{
 		return new SeekIterator(*this);

@@ -23,8 +23,8 @@ public:
 	Cache(Partition*);
 	~Cache();
 
-	Directory* getDir(){
-		return &dir;
+	Directory& getDir(){
+		return dir;
 	}
 
 	char* getBitVector(){
@@ -38,6 +38,7 @@ public:
 	void clearDir();
 	void newFileCache(EntryNum);
 	void closeFileCache(EntryNum);
+	bool hasData();
 	ClusterNo findFreeBlock();
 };
 #endif
