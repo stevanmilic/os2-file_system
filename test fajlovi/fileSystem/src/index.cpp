@@ -117,5 +117,5 @@ void IndexAlloc::writeLast(){
 	
 	//update first levle cluster,TO DO: check if it's updated?!
 	writeTo = pw->getStartCluster(entry);
-	pw->write(index[firstLevel],ClusterSize,0,entry,writeTo);
+	pw->write(index[firstLevel],ClusterSize,entry,0,writeTo);
 }

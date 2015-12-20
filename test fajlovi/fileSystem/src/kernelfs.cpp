@@ -93,8 +93,10 @@ File* KernelFS::startWriting(char* fpath){
 	EntryNum index = kexist(fpath);
 	if(index == 65)
 		return nullptr;//excep:: no partition with given name
-	else if(index <= 63)
-		kdelete(fpath);//file exists so it's deleted
+	else if(index <= 63){
+		kdelete(fpath);
+		return nullptr;//excep: file exists and it's deleted
+	}
 		
 	PartWrapper* pw = pt.findKey(PartWrapper::parseName(fpath));
 

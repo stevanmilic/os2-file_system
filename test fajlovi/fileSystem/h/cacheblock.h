@@ -22,8 +22,10 @@ class CacheBlock{
 
 	void deleteData(){
 		valid = 0;
-		delete[] data;
-		data = nullptr;
+		if (data != nullptr && data[0] != '\0') {
+			delete[] data;
+			data = nullptr;
+		}
 	}
 
 	void initData(ClusterNo blockNo){
@@ -41,7 +43,6 @@ public:
 		if(dirty)
 			writeToPartition();
 		deleteData();
-		prev = next = nullptr;
 	}
 
 	//write copy and move constructor

@@ -180,8 +180,7 @@ template <class T,class K> bool HashTable<T,K>::deleteKey(Key k){
     } 
     if(table[j]->k == k){
 	  keysInserted--;
-      //table[j]->a = Deleted;
-	  table[j]->a = Empty;
+      table[j]->a = Deleted;
 	  delete table[j]->dat;
 	  table[j]->dat = nullptr;
       return 1;

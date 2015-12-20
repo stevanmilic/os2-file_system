@@ -14,18 +14,18 @@ FCBid::operator int() const{
 
 
 void FCB::startMode(char mode){
-	filesOp++;
 	if(mode == 'r')
-		rw.startRead();
+		rw->startRead();
 	else
-		rw.startWrite();
+		rw->startWrite();
+	filesOp++;
 }
 
 void FCB::closeMode(char mode){
 	if(mode == 'r')
-		rw.stopRead();
+		rw->stopRead();
 	else
-		rw.stopWrite();
+		rw->stopWrite();
 	filesOp--;
 }
 

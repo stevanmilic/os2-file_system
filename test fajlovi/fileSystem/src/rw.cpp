@@ -7,11 +7,14 @@ ReadersWriters::ReadersWriters(){
 }
 
 ReadersWriters::~ReadersWriters(){
+	WaitForSingleObject(readClear,INFINITE);
+	CloseHandle(readClear);
 	DeleteCriticalSection(&csWriter);
 	DeleteCriticalSection(&csReader);
 }
 void ReadersWriters::startWrite(){
 	EnterCriticalSection(&csWriter);
+	WaitForSingleObject(readClear, INFINITE);
 }
 
 void ReadersWriters::stopWrite(){
@@ -19,15 +22,17 @@ void ReadersWriters::stopWrite(){
 }
 
 void ReadersWriters::startRead(){
+	EnterCriticalSection(&csWriter);
 	EnterCriticalSection(&csReader);
 	if (++readcount == 1)
-		EnterCriticalSection(&csWriter);
+			ResetEvent(readClear);
 	LeaveCriticalSection(&csReader);
+	LeaveCriticalSection(&csWriter);
 }
 
 void ReadersWriters::stopRead(){
 	EnterCriticalSection(&csReader);
 	if (--readcount == 0)
-		LeaveCriticalSection(&csWriter);
+			SetEvent(readClear);
 	LeaveCriticalSection(&csReader);
 }

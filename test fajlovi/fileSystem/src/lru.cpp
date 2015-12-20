@@ -9,8 +9,9 @@ LRU::~LRU(){
 	while(firstAccessed != nullptr){
 		CacheBlock* old = firstAccessed;
 		firstAccessed = firstAccessed->next;
-		cbs[old->blockNo] = nullptr;
+		ClusterNo oldBlock = old->blockNo;
 		delete old;
+		cbs[oldBlock] = nullptr;
 	}
 }
 
@@ -20,10 +21,15 @@ void LRU::loadPage(ClusterNo blockNo){
 	else{
 		if (lastAccessed == firstAccessed)
 			firstAccessed = nullptr;
-		CacheBlock* old = lastAccessed;
+		lastAccessed->valid = 0;
+		if(lastAccessed->dirty){
+			//write block to partition
+			lastAccessed->writeToPartition();
+			lastAccessed->dirty = 0;
+		}
+		lastAccessed->deleteData();
+		
 		lastAccessed = lastAccessed->prev;
-		cbs[old->blockNo] = nullptr;
-		delete old;
 		if(lastAccessed)
 			lastAccessed->next = nullptr;
 	}
@@ -31,6 +37,8 @@ void LRU::loadPage(ClusterNo blockNo){
 	//get current block from partition(GETNODE)
 	if(cbs[blockNo] == nullptr)
 		cbs[blockNo] = new CacheBlock(blockNo,part);
+	else
+		cbs[blockNo]->initData(blockNo);
 
 	cbs[blockNo]->next = firstAccessed;
 
@@ -51,6 +59,7 @@ CacheBlock* LRU::hitPage(ClusterNo blockNo, char write){
 		if(write)
 			cbs[blockNo]->dirty = 1;
 		if(firstAccessed != cbs[blockNo]){
+			if (cbs[blockNo]->prev == nullptr) return nullptr;
 			cbs[blockNo]->prev->next = cbs[blockNo]->next;
 			if (cbs[blockNo]->next)
 				cbs[blockNo]->next->prev = cbs[blockNo]->prev;

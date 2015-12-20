@@ -12,7 +12,7 @@ Cache::Cache(Partition* part) : lt(ENTRYCNT){
 }
 
 Cache::~Cache(){
-	memcpy(partBlock(1,1),dir,sizeof dir);
+	memcpy(dir,partBlock(1,1),sizeof dir);
 	delete [] cbs;
 	delete partLRU;
 	//hashtable deletes all file cache lru's, and writes cache blocks to part
@@ -24,7 +24,9 @@ Cache::~Cache(){
 }*/
 
 void Cache::newFileCache(EntryNum entry){
-	LRU* lru = new LRU(cbs,part);
+	LRU *lru = lt.findKey(entry);
+	if(lru == 0)
+		lru = new LRU(cbs,part);
 	lt.insertKey(entry,lru);
 }
 
