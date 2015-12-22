@@ -13,15 +13,10 @@ Cache::Cache(Partition* part) : lt(ENTRYCNT){
 
 Cache::~Cache(){
 	memcpy(partBlock(1,1),dir,sizeof dir);
-	delete [] cbs;
-	delete partLRU;
-	//hashtable deletes all file cache lru's, and writes cache blocks to part
+	lt.deleteTable();
+	//delete partLRU; crashes on delete buffer, when using 2mb input?!
+	delete[] cbs;
 }
-
-/*ClusterNo Cache::bvSize(){
-	ClusterNo bvSize = ClusterSize*8; 
-	return partSize/bvSize + partSize % bvSize == partSize ? 0 : 1;
-}*/
 
 void Cache::newFileCache(EntryNum entry){
 	LRU* lru = new LRU(cbs,part);
@@ -30,7 +25,7 @@ void Cache::newFileCache(EntryNum entry){
 
 ClusterNo Cache::findFreeBlock(){
 	//TO DO: write better search algortithm!
-	for(ClusterNo i = 0;i <= part->getNumOfClusters(); i++)
+	for(ClusterNo i = 0;i < part->getNumOfClusters(); i++)
 		if(bitVector[i] == 0){
 			bitVector[i] = 1;//project specification says otherwise? :)
 			return i;

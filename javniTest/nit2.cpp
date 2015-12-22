@@ -57,7 +57,7 @@ DWORD WINAPI nit2run(){
 		char filepath1[]="2:\\fajl2.dat";
 		filepath1[0]=p2;
 		f2=FS::open(filepath1,'w');
-		wait(mutex); cout<<"Nit2: Otvoren fajl 'fajl2.dat'"<<endl; signal(mutex);
+		//wait(mutex); cout<<"Nit2: Otvoren fajl 'fajl2.dat'"<<endl; signal(mutex);
 		char filepath2[]="2:\\fajl4.dat";
 		filepath2[0]=p2;
 		f4=FS::open(filepath2,'r');

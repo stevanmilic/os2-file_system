@@ -4,25 +4,23 @@
 IndexAlloc::IndexAlloc(PartWrapper* pw,EntryNum entry){
 	this->pw = pw;
 	this->entry = entry;
-	index = new ClusterNo*[secondLevel + 1];
-	index[firstLevel] = new ClusterNo[numOfIndex];
-	index[secondLevel] = new ClusterNo[numOfIndex];
 }
 
-IndexAlloc::~IndexAlloc(){
-	delete index[firstLevel];
-	delete index[secondLevel];
-	delete [] index;
-}
-
-void IndexAlloc::loadIndex(){
-	pw->read(index[firstLevel],ClusterSize,0,entry,pw->getStartCluster(entry));
-	if(indexCluster == secondLevel && dataCluster ==numOfIndex - 1){
-		pw->read(index[secondLevel],ClusterSize,0,entry,index[firstLevel][secondLevelIndex - 1]);
+void IndexAlloc::loadIndex(char mode){
+	pw->read(index[firstLevel], ClusterSize, 0, entry, pw->getStartCluster(entry));
+	if(indexCluster == secondLevel){
+		if (mode == 'r') {
+			if (lastMode == 'w')
+				secondLevelIndex++;
+			pw->read(index[secondLevel], ClusterSize, 0, entry, index[firstLevel][secondLevelIndex - 1]);
+		}
+		else{
+			  if(lastMode == 'r')
+				  secondLevelIndex--;
+			  pw->read(index[secondLevel], ClusterSize, 0, entry, index[firstLevel][secondLevelIndex]);
+		}
 	}
-	else if (indexCluster == secondLevel && dataCluster != numOfIndex - 1) {
-		pw->read(index[secondLevel], ClusterSize, 0, entry, index[firstLevel][secondLevelIndex]);
-	}
+	lastMode = mode;
 }
 
 void IndexAlloc::load(BytesCnt len,char* buffer){
@@ -35,6 +33,7 @@ void IndexAlloc::load(BytesCnt len,char* buffer){
 		secondLevelIndex = numOfDataIndexF;//current second level index
 		currOffset = 0;
 		currSize = ClusterSize;
+		readCluster = 0;
 	}
 	this->len = len;
 }
@@ -57,7 +56,7 @@ Iterator* IndexAlloc::createIterator(char mode){
 
 
 void IndexAlloc::readIndex(BytesCnt current){
-	if(indexCluster == firstLevel && dataCluster == numOfDataIndexF - 1){
+	if(indexCluster == firstLevel && dataCluster == numOfDataIndexF){
 		++indexCluster;
 		pw->read(index[secondLevel],ClusterSize,0,entry,index[firstLevel][secondLevelIndex++]);
 		dataCluster = 0;
@@ -66,15 +65,17 @@ void IndexAlloc::readIndex(BytesCnt current){
 		pw->read(index[secondLevel],ClusterSize,0,entry,index[firstLevel][secondLevelIndex++]);
 		dataCluster = 0;
 	}
-	if (readCluster += currSize >= ClusterSize) {
-		dataCluster++;
-		readCluster = 0;
-	}
+	
 	pw->read(buffer + current,currSize,currOffset,entry,index[indexCluster][dataCluster]);
+	readCluster += currSize;
+	if(readCluster >= ClusterSize) {
+		readCluster = 0;
+		dataCluster++;
+	}
 }
 
 void IndexAlloc::seekIndex(BytesCnt current){
-	if(indexCluster == firstLevel && dataCluster == numOfDataIndexF - 1){
+	if(indexCluster == firstLevel && dataCluster == numOfDataIndexF){
 		++indexCluster;
 		pw->read(index[secondLevel],ClusterSize,0,entry,index[firstLevel][secondLevelIndex++]);
 		dataCluster = 0;
@@ -83,16 +84,18 @@ void IndexAlloc::seekIndex(BytesCnt current){
 		pw->read(index[secondLevel],ClusterSize,0,entry,index[firstLevel][secondLevelIndex++]);
 		dataCluster = 0;
 	}
-	if (readCluster += currSize >= ClusterSize) {
-		dataCluster++;
+	readCluster += currSize;
+	if (readCluster >= ClusterSize) {
 		readCluster = 0;
+		dataCluster++;
 	}
 }
 
 void IndexAlloc::writeIndex(BytesCnt current){
-	if(indexCluster == firstLevel && dataCluster == (numOfDataIndexF - 1)){
+	if(indexCluster == firstLevel && dataCluster == (numOfDataIndexF)){
 		++indexCluster;
 		dataCluster = 0;
+		memset(index[secondLevel], 0, ClusterSize);
 	}
 	//write to second level indexes
 	else if(dataCluster == (numOfIndex - 1)){
@@ -101,17 +104,19 @@ void IndexAlloc::writeIndex(BytesCnt current){
 		memset(index[secondLevel],0,ClusterSize);
 		dataCluster = 0;
 	}
-	if (readCluster += currSize >= ClusterSize) {
-		dataCluster++;
-		readCluster = 0;
-		writeTo = 0;
-	}
+	
+	writeTo = index[indexCluster][dataCluster];
 	index[indexCluster][dataCluster] = pw->write(buffer + current,currSize,currOffset,entry,writeTo);
+	readCluster += currSize;
+	if (readCluster >= ClusterSize) {
+		readCluster = 0;
+		dataCluster++;
+	}
 }
 
 void IndexAlloc::writeLast(){
 	if (indexCluster == secondLevel && dataCluster != numOfIndex - 1){
-		writeTo = 0;
+		writeTo = index[firstLevel][secondLevelIndex];
 		index[firstLevel][secondLevelIndex] = pw->write(index[secondLevel], ClusterSize, 0, entry, writeTo);
 	}
 	

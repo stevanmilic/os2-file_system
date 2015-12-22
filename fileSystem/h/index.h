@@ -22,17 +22,22 @@ class IndexAlloc{
 
 	PartWrapper *pw;
 	EntryNum entry;
-	ClusterNo** index;
+	ClusterNo index[secondLevel + 1][numOfIndex] = { { 0 }, { 0 } };
 	char* buffer;
 	BytesCnt len;
+	char lastMode = '\0';
 
 public:
 	
 	IndexAlloc(PartWrapper*,EntryNum);
-	~IndexAlloc();
-	void loadIndex();
+	~IndexAlloc() = default;
+	void loadIndex(char='r');
 	void load(BytesCnt,char* =nullptr);//argument: size of buffer
 	Iterator* createIterator(char);
+	void incDataCluster() {
+		writeTo = 0;
+		dataCluster++;
+	}
 	BytesCnt getLen() const{
 		return len;
 	}

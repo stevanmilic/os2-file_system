@@ -16,7 +16,6 @@ void startWrite();
 void stopWrite();
 void startRead();
 void stopRead();
-
 };
 
 #endif

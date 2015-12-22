@@ -46,6 +46,8 @@ public:
 		this->id = id;
 	}
 
+	~FCB() = default;
+
 	void startMode(char mode);
 
 	void closeMode(char mode);

@@ -42,7 +42,6 @@ void WriteIterator::next(){
 	Iterator::next();
 }
 
-
 bool WriteIterator::done(){
 	if(current >= index->getLen()){
 		if(smallFile)
@@ -55,7 +54,6 @@ bool WriteIterator::done(){
 	}
 	return false;
 }
-
 
 void SeekIterator::next(){
 	index->seekIndex(current);

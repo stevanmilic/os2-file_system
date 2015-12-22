@@ -42,7 +42,7 @@ EntryNum KernelFS::kexist(char* fname){
 	if(pw == 0)
 		return 65;//excep: partition doesn't exist
 	Directory& myDir = pw->rootDir();
-	char *name = new char[FNAMELEN];
+	char name[FNAMELEN];
 	FCB::parseName(fname,name);
 	for(EntryNum j = 0;j < ENTRYCNT; j++)
 		if(strcmp(myDir[j].name,name) == 0)

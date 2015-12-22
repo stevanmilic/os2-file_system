@@ -3,13 +3,15 @@
 #define _lru_h_
 #include "cacheblock.h"
 #include "part.h"
+#include <windows.h>
 
 class LRU{
-	ClusterNo cacheSize = 10;
+	ClusterNo cacheSize = 16;
 	CacheBlock **cbs;
 	CacheBlock *firstAccessed = nullptr, *lastAccessed = nullptr;
 	ClusterNo victim = 0;
 	Partition *part;
+	CRITICAL_SECTION csBlock;
 
 public:
 	LRU(CacheBlock**,Partition*);

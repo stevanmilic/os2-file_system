@@ -23,7 +23,7 @@ void PartWrapper::clear(){
 		EnterCriticalSection(&csPart);
 		cache->clearBitVector();
 		cache->clearDir();
-		//TO DO :cache->clearCacheBlocks();
+		//TO DO :cache->clearCacheBlocks(); optional?
 		LeaveCriticalSection(&csPart);
 		format = false;
 	}
@@ -34,13 +34,13 @@ Directory& PartWrapper::rootDir(){
 }
 
 void PartWrapper::read(void *buffer,BytesCnt buffSize,BytesCnt offset, EntryNum entry, ClusterNo readCluster){
-	std::memcpy(buffer,cache->cacheBlock(entry,readCluster,0) + offset,buffSize);
+	memcpy(buffer,cache->cacheBlock(entry,readCluster,0) + offset,buffSize);
 }
 
 ClusterNo PartWrapper::write(void* buffer,BytesCnt buffSize,BytesCnt offset, EntryNum entry,ClusterNo& writeCluster){
 	if(writeCluster == 0)
 		writeCluster = cache->findFreeBlock();
-	std::memcpy(cache->cacheBlock(entry,writeCluster,1) + offset,buffer,buffSize);
+	memcpy(cache->cacheBlock(entry,writeCluster,1) + offset,buffer,buffSize);
 	return writeCluster;
 }
 

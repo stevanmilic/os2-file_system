@@ -22,7 +22,7 @@ class CacheBlock{
 
 	void deleteData(){
 		valid = 0;
-		delete[] data;
+		delete [] data;
 		data = nullptr;
 	}
 

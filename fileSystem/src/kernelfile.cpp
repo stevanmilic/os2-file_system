@@ -15,6 +15,7 @@ KernelFile::~KernelFile(){
 		pw->fclose(fcb->getEntry());
 		KernelFS::ft.deleteKey(id);
 	}
+	delete index;
 }
 
 void KernelFile::addFCBid(FCBid id){
@@ -22,15 +23,16 @@ void KernelFile::addFCBid(FCBid id){
 	FCB *fcb = KernelFS::ft.findKey(id);
 	PartWrapper* pw = KernelFS::pt.findKey(fcb->getPart());
 	index = new IndexAlloc(pw, fcb->getEntry());
+	if (id.getMode() == 'a')
+		seek(getFileSize());
 }
 
 char KernelFile::kwrite(BytesCnt len, char *writeBuffer){
 	if(id.getMode() == 'r')
 		return 0;
 
-	//if file already has data written
 	if(getFileSize())
-		index->loadIndex();
+		index->loadIndex('w');
 
 	index->load(len,writeBuffer);
 
@@ -50,9 +52,6 @@ char KernelFile::kwrite(BytesCnt len, char *writeBuffer){
 }
 
 BytesCnt KernelFile::kread(BytesCnt len, char *readBuffer){
-	/*if(id.getMode() == 'w')
-		return 0;*/
-	
 	if(getFileSize()){
 		index->loadIndex();
 		if(currByte + len > getFileSize())
@@ -67,7 +66,6 @@ BytesCnt KernelFile::kread(BytesCnt len, char *readBuffer){
 	delete iter;
 	return iter->curr();
 }
-
 
 char KernelFile::seek(BytesCnt len){
 	if(getFileSize()){
@@ -85,7 +83,6 @@ char KernelFile::seek(BytesCnt len){
 	delete iter;
 	return 1;
 }
-
 
 BytesCnt KernelFile::filePos(){
 	return currByte;

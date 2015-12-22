@@ -21,9 +21,16 @@ template <class T,class K> class HashTable{
 	  Elem(newElem->k, newElem->dat, newElem->a);
 	}
 
+	
+	void deleteData() {
+		if (dat != nullptr) {
+			delete dat;
+			dat = nullptr;
+		}
+	}
+
 	~Elem() {
-	   if (dat != nullptr)
-	     delete dat;
+		deleteData();
 	}
   }; 
   Elem **table;
@@ -35,7 +42,6 @@ template <class T,class K> class HashTable{
   void write(ostream& it) const;
   void copy(const HashTable& ht);
   void move(HashTable& ht);
-  void deleteTable();
   int h(int k);
   
 public:
@@ -46,6 +52,8 @@ public:
       table[i] = new Elem;
 	address = new QuadraticHashing(n);
   } 
+
+  void deleteTable();
 
   ~HashTable(){
     deleteTable();
@@ -112,10 +120,12 @@ template <class T,class K> void HashTable<T,K>::move(HashTable<T,K>& ht){
 } 
 
 template <class T,class K> void HashTable<T,K>::deleteTable(){
-  for(int i = 0; i < n; i++)
-    delete table[i];
-  delete [] table;
-  table = nullptr;
+	if (table != nullptr) {
+		for (int i = 0; i < n; i++)
+			delete table[i];
+		delete[] table;
+		table = nullptr;
+	}
 } 
 
 template <class T,class K> int HashTable<T,K>::h(int k){
@@ -182,8 +192,7 @@ template <class T,class K> bool HashTable<T,K>::deleteKey(Key k){
 	  keysInserted--;
       //table[j]->a = Deleted;
 	  table[j]->a = Empty;
-	  delete table[j]->dat;
-	  table[j]->dat = nullptr;
+	  table[j]->deleteData();
       return 1;
     } 
     else{

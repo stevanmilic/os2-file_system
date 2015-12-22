@@ -9,7 +9,7 @@ class PartWrapper{
 	Cache* cache;
 	Partition *part;
 
-	mutable CRITICAL_SECTION csPart;
+	CRITICAL_SECTION csPart;
 	
 	static char posID;//default 0
 	char id = posID++;
