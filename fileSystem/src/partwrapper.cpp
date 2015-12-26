@@ -17,6 +17,7 @@ PartWrapper::~PartWrapper(){
 
 	DeleteCriticalSection(&csPart);
 }
+
 void PartWrapper::clear(){
 	if (!unmount) {
 		format = true;
@@ -46,6 +47,10 @@ ClusterNo PartWrapper::write(void* buffer,BytesCnt buffSize,BytesCnt offset, Ent
 
 ClusterNo PartWrapper::cluster(){
 	return cache->findFreeBlock();
+}
+
+void PartWrapper::delCluster(ClusterNo deleteCluster){
+	cache->clearBlock(deleteCluster);	
 }
 
 void PartWrapper::fopen(EntryNum entry){

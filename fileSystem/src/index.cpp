@@ -54,7 +54,6 @@ Iterator* IndexAlloc::createIterator(char mode){
 	}
 }
 
-
 void IndexAlloc::readIndex(BytesCnt current){
 	if(indexCluster == firstLevel && dataCluster == numOfDataIndexF){
 		++indexCluster;
@@ -108,7 +107,7 @@ void IndexAlloc::writeIndex(BytesCnt current){
 	writeTo = index[indexCluster][dataCluster];
 	index[indexCluster][dataCluster] = pw->write(buffer + current,currSize,currOffset,entry,writeTo);
 	readCluster += currSize;
-	if (readCluster >= ClusterSize) {
+	if(readCluster >= ClusterSize) {
 		readCluster = 0;
 		dataCluster++;
 	}

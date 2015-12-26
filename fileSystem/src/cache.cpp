@@ -5,16 +5,16 @@ Cache::Cache(Partition* part) : lt(ENTRYCNT){
 	this->part = part;
 	cbs = new CacheBlock*[part->getNumOfClusters()]();
 	partLRU = new LRU(cbs,part);
-	bitVector = partBlock(0,1);//read blockNo = 1, and make it dirty
 	memcpy(dir,partBlock(1,0),sizeof dir);
-	bitVector[0] = 1;
-	bitVector[1] = 1;
+	bitVector = new BitVector(partBlock(0,1));
+	(*bitVector)[0] = true;
+	(*bitVector)[1] = true;
 }
 
 Cache::~Cache(){
 	memcpy(partBlock(1,1),dir,sizeof dir);
 	lt.deleteTable();
-	//delete partLRU; crashes on delete buffer, when using 2mb input?!
+	delete partLRU;// crashes on delete buffer, when using 2mb input?!
 	delete[] cbs;
 }
 
@@ -26,13 +26,16 @@ void Cache::newFileCache(EntryNum entry){
 ClusterNo Cache::findFreeBlock(){
 	//TO DO: write better search algortithm!
 	for(ClusterNo i = 0;i < part->getNumOfClusters(); i++)
-		if(bitVector[i] == 0){
-			bitVector[i] = 1;//project specification says otherwise? :)
+		if( (*bitVector)[i] == 0){
+			(*bitVector)[i] = 1;//project specification says otherwise? :)
 			return i;
 		}
 	return 0;
 }
 
+void Cache::clearBlock(ClusterNo blockNo){
+	(*bitVector)[blockNo] = 0;
+}
 
 char* Cache:: partBlock(ClusterNo blockNo,char write){
 	return getBlock(partLRU,blockNo,write);
@@ -57,7 +60,9 @@ char* Cache::getBlock(LRU *lru,ClusterNo blockNo, char write, EntryNum entry){
 }
 
 void Cache::clearBitVector(){
-	memset(bitVector + 2,0,ClusterSize -2);
+	bitVector->clearBitVector();
+	(*bitVector)[0] = 1;
+	(*bitVector)[1] = 1;
 }
 
 void Cache::clearDir(){

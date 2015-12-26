@@ -60,9 +60,7 @@ char KernelFS::kreadRootDir(char part, EntryNum entryNum,Directory &dir){
 	for(int i = entryNum; i < ENTRYCNT; i++)
 		if(myDir[i].name[0] != '\0')
 			dir[counter++] = myDir[i];
-	if(counter < 64)
-		return 0;
-	return 1;
+	return counter;
 }
 
 File* KernelFS::newFileOpened(PartWrapper* pw, char* fpath, EntryNum index, char mode){

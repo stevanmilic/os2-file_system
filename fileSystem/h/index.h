@@ -34,10 +34,6 @@ public:
 	void loadIndex(char='r');
 	void load(BytesCnt,char* =nullptr);//argument: size of buffer
 	Iterator* createIterator(char);
-	void incDataCluster() {
-		writeTo = 0;
-		dataCluster++;
-	}
 	BytesCnt getLen() const{
 		return len;
 	}

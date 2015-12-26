@@ -45,6 +45,7 @@ public:
 	void read(void*,BytesCnt,BytesCnt,EntryNum,ClusterNo);
 	ClusterNo write(void*,BytesCnt,BytesCnt, EntryNum,ClusterNo&);
 	ClusterNo cluster();
+	void delCluster(ClusterNo);
 	void fopen(EntryNum);
 	void fclose(EntryNum);
 	bool getFormat();

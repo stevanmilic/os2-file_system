@@ -5,6 +5,7 @@
 #include "part.h"
 #include "lru.h"
 #include "fs.h"
+#include "bitvector.h"
 
 class Cache{
 //TO DO: implementation:
@@ -16,19 +17,14 @@ class Cache{
 	LRU* partLRU;
 	HashTable<LRU*, EntryNum> lt = HashTable<LRU*, EntryNum>(ENTRYCNT);
 	Directory dir;
-	char* bitVector;
+	BitVector *bitVector;
 
-	ClusterNo bvSize();
 public:
 	Cache(Partition*);
 	~Cache();
 
 	Directory& getDir(){
 		return dir;
-	}
-
-	char* getBitVector(){
-		return bitVector;
 	}
 
 	char* getBlock(LRU*,ClusterNo,char,EntryNum=0);
@@ -40,5 +36,6 @@ public:
 	void closeFileCache(EntryNum);
 	bool hasData();
 	ClusterNo findFreeBlock();
+	void clearBlock(ClusterNo);
 };
 #endif

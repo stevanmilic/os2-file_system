@@ -36,7 +36,7 @@ void LRU::loadPage(ClusterNo blockNo){
 	cbs[blockNo]->next = firstAccessed;
 
 	// If queue is empty, change both front and rear pointers
-	if (lastAccessed == nullptr)
+	if(lastAccessed == nullptr)
 		firstAccessed = lastAccessed = cbs[blockNo];
 	else  // Else change the front
 	{
@@ -54,12 +54,12 @@ CacheBlock* LRU::hitPage(ClusterNo blockNo, char write){
 		if(write)
 			cbs[blockNo]->dirty = 1;
 		if(firstAccessed != cbs[blockNo]){
-			if (cbs[blockNo]->prev == nullptr)
+			if(cbs[blockNo]->prev == nullptr)
 				return nullptr;
 			cbs[blockNo]->prev->next = cbs[blockNo]->next;
-			if (cbs[blockNo]->next)
+			if(cbs[blockNo]->next)
 				cbs[blockNo]->next->prev = cbs[blockNo]->prev;
-			if (lastAccessed == cbs[blockNo]) {
+			if(lastAccessed == cbs[blockNo]) {
 				lastAccessed = cbs[blockNo]->prev;
 				lastAccessed->next = nullptr;
 			}

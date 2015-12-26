@@ -4,7 +4,6 @@
 #include "fcb.h"
 #include "kernelfs.h"
 #include "index.h"
-//#include "partwrapper.h"
 
 class KernelFile{
 	friend class File;
