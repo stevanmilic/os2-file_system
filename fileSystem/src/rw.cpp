@@ -1,33 +1,38 @@
 #include "rw.h"
 
-ReadersWriters::ReadersWriters(){
+ReadersWriters::ReadersWriters() {
 	InitializeCriticalSection(&csWriter);
 	InitializeCriticalSection(&csReader);
-	readClear = CreateEvent(NULL,TRUE,TRUE,NULL);
+	readClear = CreateEvent(NULL, TRUE, TRUE, NULL);
 }
 
-ReadersWriters::~ReadersWriters(){
+ReadersWriters::~ReadersWriters() {
+	WaitForSingleObject(readClear, INFINITE);
+	CloseHandle(readClear);
 	DeleteCriticalSection(&csWriter);
 	DeleteCriticalSection(&csReader);
 }
-void ReadersWriters::startWrite(){
+void ReadersWriters::startWrite() {
 	EnterCriticalSection(&csWriter);
+	WaitForSingleObject(readClear, INFINITE);
 }
 
-void ReadersWriters::stopWrite(){
+void ReadersWriters::stopWrite() {
 	LeaveCriticalSection(&csWriter);
 }
 
-void ReadersWriters::startRead(){
+void ReadersWriters::startRead() {
+	EnterCriticalSection(&csWriter);
 	EnterCriticalSection(&csReader);
 	if (++readcount == 1)
-		EnterCriticalSection(&csWriter);
+		ResetEvent(readClear);
 	LeaveCriticalSection(&csReader);
+	LeaveCriticalSection(&csWriter);
 }
 
-void ReadersWriters::stopRead(){
+void ReadersWriters::stopRead() {
 	EnterCriticalSection(&csReader);
 	if (--readcount == 0)
-		LeaveCriticalSection(&csWriter);
+		SetEvent(readClear);
 	LeaveCriticalSection(&csReader);
 }

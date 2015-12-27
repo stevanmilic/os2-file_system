@@ -1,13 +1,13 @@
 #include "lru.h"
 
-LRU::LRU(CacheBlock **cbs, Partition *part){
+LRU::LRU(CacheBlock **cbs, Partition *part) {
 	this->cbs = cbs;
 	this->part = part;
 	InitializeCriticalSection(&csBlock);
 }
 
-LRU::~LRU(){
-	while(firstAccessed != nullptr){
+LRU::~LRU() {
+	while (firstAccessed != nullptr) {
 		CacheBlock* old = firstAccessed;
 		firstAccessed = firstAccessed->next;
 		cbs[old->blockNo] = nullptr;
@@ -16,27 +16,27 @@ LRU::~LRU(){
 	DeleteCriticalSection(&csBlock);
 }
 
-void LRU::loadPage(ClusterNo blockNo){
+void LRU::loadPage(ClusterNo blockNo) {
 	EnterCriticalSection(&csBlock);
-	if(victim < cacheSize)
+	if (victim < cacheSize)
 		victim++;
-	else{
+	else {
 		/*if (lastAccessed == firstAccessed)
 			firstAccessed = nullptr;*/
 		CacheBlock* old = lastAccessed;
 		lastAccessed = lastAccessed->prev;
 		cbs[old->blockNo] = nullptr;
 		delete old;
-		if(lastAccessed)
+		if (lastAccessed)
 			lastAccessed->next = nullptr;
 	}
 
 	//get current block from partition(GETNODE)
-	cbs[blockNo] = new CacheBlock(blockNo,part);
+	cbs[blockNo] = new CacheBlock(blockNo, part);
 	cbs[blockNo]->next = firstAccessed;
 
 	// If queue is empty, change both front and rear pointers
-	if(lastAccessed == nullptr)
+	if (lastAccessed == nullptr)
 		firstAccessed = lastAccessed = cbs[blockNo];
 	else  // Else change the front
 	{
@@ -48,18 +48,18 @@ void LRU::loadPage(ClusterNo blockNo){
 	LeaveCriticalSection(&csBlock);
 }
 
-CacheBlock* LRU::hitPage(ClusterNo blockNo, char write){
-	if(cbs[blockNo] != nullptr && cbs[blockNo]->valid){
+CacheBlock* LRU::hitPage(ClusterNo blockNo, char write) {
+	if (cbs[blockNo] != nullptr && cbs[blockNo]->valid) {
 		EnterCriticalSection(&csBlock);
-		if(write)
+		if (write)
 			cbs[blockNo]->dirty = 1;
-		if(firstAccessed != cbs[blockNo]){
-			if(cbs[blockNo]->prev == nullptr)
+		if (firstAccessed != cbs[blockNo]) {
+			if (cbs[blockNo]->prev == nullptr)
 				return nullptr;
 			cbs[blockNo]->prev->next = cbs[blockNo]->next;
-			if(cbs[blockNo]->next)
+			if (cbs[blockNo]->next)
 				cbs[blockNo]->next->prev = cbs[blockNo]->prev;
-			if(lastAccessed == cbs[blockNo]) {
+			if (lastAccessed == cbs[blockNo]) {
 				lastAccessed = cbs[blockNo]->prev;
 				lastAccessed->next = nullptr;
 			}

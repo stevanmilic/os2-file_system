@@ -12,7 +12,7 @@ class KernelFile{
 	IndexAlloc* index;
 	BytesCnt currByte = 0;//current byte position in file
 
-	KernelFile();
+	KernelFile() = default;
 	
 	char kwrite(BytesCnt,char*);
 	BytesCnt kread(BytesCnt,char*);
@@ -24,6 +24,7 @@ class KernelFile{
 
 public:
 	void addFCBid(FCBid);
+	static void kdeleteFile(PartWrapper*,EntryNum);
 	~KernelFile();
 };
 #endif

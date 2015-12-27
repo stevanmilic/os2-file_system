@@ -53,6 +53,8 @@ public:
 	void seekIndex(BytesCnt);
 	void writeIndex(BytesCnt);
 	void writeLast();
+	void deleteIndex(BytesCnt);
+	void deleteLast();
 
 };
 #endif

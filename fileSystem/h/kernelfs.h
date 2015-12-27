@@ -27,7 +27,7 @@ class KernelFS{
 		EntryNum kexist(char*);
 		char kreadRootDir(char,EntryNum,Directory&);
 		File* kopen(char*,char);
-		char kdelete(char*); 
+		char kdelete(char*,bool=false); 
 
 		File* newFileOpened(PartWrapper*,char*,EntryNum,char);
 		File* startReading(char*,char);

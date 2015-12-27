@@ -3,13 +3,13 @@
 
 char PartWrapper::posID = 0;
 
-PartWrapper::PartWrapper(Partition* part){
+PartWrapper::PartWrapper(Partition* part) {
 	this->part = part;
 	cache = new Cache(part);
 	InitializeCriticalSection(&csPart);
 }
 
-PartWrapper::~PartWrapper(){
+PartWrapper::~PartWrapper() {
 	unmount = true;
 	EnterCriticalSection(&csPart);
 	delete cache;
@@ -18,7 +18,7 @@ PartWrapper::~PartWrapper(){
 	DeleteCriticalSection(&csPart);
 }
 
-void PartWrapper::clear(){
+void PartWrapper::clear() {
 	if (!unmount) {
 		format = true;
 		EnterCriticalSection(&csPart);
@@ -30,30 +30,30 @@ void PartWrapper::clear(){
 	}
 }
 
-Directory& PartWrapper::rootDir(){
+Directory& PartWrapper::rootDir() {
 	return cache->getDir();
 }
 
-void PartWrapper::read(void *buffer,BytesCnt buffSize,BytesCnt offset, EntryNum entry, ClusterNo readCluster){
-	memcpy(buffer,cache->cacheBlock(entry,readCluster,0) + offset,buffSize);
+void PartWrapper::read(void *buffer, BytesCnt buffSize, BytesCnt offset, EntryNum entry, ClusterNo readCluster) {
+	memmove(buffer, cache->cacheBlock(entry, readCluster, 0) + offset, buffSize);
 }
 
-ClusterNo PartWrapper::write(void* buffer,BytesCnt buffSize,BytesCnt offset, EntryNum entry,ClusterNo& writeCluster){
-	if(writeCluster == 0)
+ClusterNo PartWrapper::write(void* buffer, BytesCnt buffSize, BytesCnt offset, EntryNum entry, ClusterNo& writeCluster) {
+	if (writeCluster == 0)
 		writeCluster = cache->findFreeBlock();
-	memcpy(cache->cacheBlock(entry,writeCluster,1) + offset,buffer,buffSize);
+	memmove(cache->cacheBlock(entry, writeCluster, 1) + offset, buffer, buffSize);
 	return writeCluster;
 }
 
-ClusterNo PartWrapper::cluster(){
+ClusterNo PartWrapper::cluster() {
 	return cache->findFreeBlock();
 }
 
-void PartWrapper::delCluster(ClusterNo deleteCluster){
-	cache->clearBlock(deleteCluster);	
+void PartWrapper::delCluster(ClusterNo deleteCluster) {
+	cache->clearBlock(deleteCluster);
 }
 
-void PartWrapper::fopen(EntryNum entry){
+void PartWrapper::fopen(EntryNum entry) {
 	cache->newFileCache(entry);
 	if (!cacheUsed && cache->hasData()) {
 		cacheUsed = true;
@@ -61,7 +61,7 @@ void PartWrapper::fopen(EntryNum entry){
 	}
 }
 
-void PartWrapper::fclose(EntryNum entry){
+void PartWrapper::fclose(EntryNum entry) {
 	cache->closeFileCache(entry);
 	if (cacheUsed && !cache->hasData()) {
 		LeaveCriticalSection(&csPart);
@@ -69,21 +69,21 @@ void PartWrapper::fclose(EntryNum entry){
 	}
 }
 
-bool PartWrapper::getFormat(){
+bool PartWrapper::getFormat() {
 	return format;
 }
 
-ClusterNo PartWrapper::getStartCluster(EntryNum entry){
+ClusterNo PartWrapper::getStartCluster(EntryNum entry) {
 	Directory& dir = rootDir();
 	return dir[entry].indexCluster;
 }
 
-BytesCnt PartWrapper::getFileSize(EntryNum entry){
+BytesCnt PartWrapper::getFileSize(EntryNum entry) {
 	Directory& dir = rootDir();
 	return dir[entry].size;
 }
 
-void PartWrapper::setFileSize(EntryNum entry,BytesCnt size){
+void PartWrapper::setFileSize(EntryNum entry, BytesCnt size) {
 	Directory& dir = rootDir();
 	dir[entry].size = size;
 }

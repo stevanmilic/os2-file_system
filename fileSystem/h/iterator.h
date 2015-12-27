@@ -56,4 +56,14 @@ public:
 	}
 	void next() override;
 };
+
+class DeleteIterator: public Iterator{
+public:
+	DeleteIterator(IndexAlloc *index) : Iterator(index){}
+	DeleteIterator* copy() const override{
+		return new DeleteIterator(*this);
+	}
+	void next() override;
+	bool done() override;
+};
 #endif
